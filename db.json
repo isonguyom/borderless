@@ -1,0 +1,154 @@
+{
+  "users": [
+    {
+      "id": "83fb",
+      "emailOrPhone": "isonguyom@gmail.com",
+      "createdAt": "2025-09-16T14:34:32.660Z"
+    },
+    {
+      "id": "8ca5",
+      "emailOrPhone": "isonguyom@gmail.com",
+      "createdAt": "2025-09-17T12:55:44.029Z"
+    },
+    {
+      "id": "a38f",
+      "emailOrPhone": "isonguyom@gmail.com",
+      "createdAt": "2025-09-17T14:28:31.650Z"
+    }
+  ],
+  "tokens": [
+    {
+      "id": "40dc",
+      "userId": "83fb",
+      "token": "mock_1758033721092_k5vgkk8fwff"
+    },
+    {
+      "id": "251a",
+      "userId": "83fb",
+      "token": "mock_1758033751883_k8xc90p7e2"
+    },
+    {
+      "id": "0d25",
+      "userId": "83fb",
+      "token": "mock_1758033769825_4mi8euso9um"
+    },
+    {
+      "id": "4c8b",
+      "userId": "83fb",
+      "token": "mock_1758048752962_daolc2er725"
+    },
+    {
+      "id": "02fc",
+      "userId": "83fb",
+      "token": "mock_1758048790774_myvsgyq68z"
+    },
+    {
+      "id": "7a91",
+      "userId": "83fb",
+      "token": "mock_1758097856712_8zb83blkevl"
+    },
+    {
+      "id": "d821",
+      "userId": "83fb",
+      "token": "mock_1758097907671_rjktq0vmz7n"
+    },
+    {
+      "id": "016a",
+      "userId": "8ca5",
+      "token": "mock_1758113744675_zluuij87xh"
+    },
+    {
+      "id": "8eb6",
+      "userId": "83fb",
+      "token": "mock_1758116023486_6f4ty9n5wcj"
+    },
+    {
+      "id": "387d",
+      "userId": "83fb",
+      "token": "mock_1758118569791_e3xdchj5xak"
+    },
+    {
+      "id": "ceed",
+      "userId": "83fb",
+      "token": "mock_1758118582621_pwnvlaxzhmq"
+    },
+    {
+      "id": "a99c",
+      "userId": "a38f",
+      "token": "mock_1758119311690_on43xwjeowf"
+    },
+    {
+      "id": "0539",
+      "userId": "83fb",
+      "token": "mock_1758119702207_uvlcvv54tp"
+    },
+    {
+      "id": "58c3",
+      "userId": "83fb",
+      "token": "mock_1758120045940_uolbwrgqrmf"
+    },
+    {
+      "id": "f06c",
+      "userId": "83fb",
+      "token": "mock_1758133409609_78vp7kx5uh"
+    },
+    {
+      "id": "e08a",
+      "userId": "83fb",
+      "token": "mock_1758134390892_fn7masin28"
+    },
+    {
+      "id": "3c81",
+      "userId": "83fb",
+      "token": "mock_1758148356051_s12r3npt3so"
+    },
+    {
+      "id": "9b8b",
+      "userId": "83fb",
+      "token": "mock_1758148382151_egv4de20fht"
+    }
+  ],
+  "wallet": [
+    {
+      "id": "tx_01",
+      "type": "deposit|swap|send",
+      "walletId": "wallet_01",
+      "amount": 100,
+      "currency": "USDC",
+      "status": "pending|confirmed|failed",
+      "meta": {
+        "from": "...",
+        "to": "...",
+        "rate": 1,
+        "fee": 0.5
+      },
+      "createdAt": "2025-09-16T12:05:00Z"
+    }
+  ],
+  "transactions": [
+    {
+      "id": "1",
+      "type": "Deposit",
+      "currency": "USDT",
+      "amount": 500,
+      "date": "2025-09-15T10:00:00Z",
+      "status": "Completed"
+    },
+    {
+      "id": "2",
+      "type": "Swap",
+      "currency": "USDT → USDC",
+      "amount": 200,
+      "date": "2025-09-14T14:20:00Z",
+      "status": "Pending"
+    },
+    {
+      "id": "3",
+      "type": "Send",
+      "currency": "USDC",
+      "amount": 100,
+      "date": "2025-09-12T18:45:00Z",
+      "status": "Completed"
+    }
+  ]
+}
