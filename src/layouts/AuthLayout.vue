@@ -1,7 +1,7 @@
 <template>
   <div class="min-h-screen flex flex-col">
 
-    <div class="w-full flex-1 grid grid-cols-1 md:grid-cols-2 border">
+    <div class="w-full flex-1 grid grid-cols-1 md:grid-cols-2">
       <!-- Left side (brand / illustration) -->
       <div class="hidden md:flex flex-col items-center justify-center p-6 relative">
         <!-- Decorative element -->
