@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import { useWalletStore } from '@/stores/wallets'
+import { useWalletsStore } from '@/stores/wallets'
 
-const walletStore = useWalletStore()
+const walletStore = useWalletsStore()
 const fromWalletId = ref(null)
 const toWalletId = ref(null)
 const amount = ref(0)
