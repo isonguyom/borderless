@@ -1,8 +1,8 @@
 <script setup>
 import { ref } from 'vue'
-import { useWalletStore } from '@/stores/wallets'
+import { useWalletsStore } from '@/stores/wallets'
 
-const walletStore = useWalletStore()
+const walletStore = useWalletsStore()
 const type = ref('USDT')
 const batch = ref('Batch A')
 
