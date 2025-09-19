@@ -1,11 +1,10 @@
 <template>
   <div class="relative w-full overflow-hidden">
-
     <h2 class="md:text-lg font-medium mb-2">Wallets</h2>
 
     <!-- Carousel Wrapper -->
     <div ref="carousel" class="flex transition-transform duration-500 ease-in-out"
-      :style="{ transform: `translateX(-${currentIndex * (100 / slidesPerView)}%)` }" @touchstart="startSwipe"
+      :style="{ transform: `translateX(-${(currentIndex * 100) / slidesPerView}%)` }" @touchstart="startSwipe"
       @touchmove="swipeMove" @touchend="endSwipe">
       <div v-for="wallet in wallets" :key="wallet.currency" class="flex-shrink-0 px-2"
         :style="{ width: `${100 / slidesPerView}%` }">
@@ -15,15 +14,15 @@
 
     <!-- Indicators -->
     <div class="flex justify-center mt-4 space-x-2">
-      <span v-for="(_, index) in totalPages" :key="index" class="h-2 rounded transition-all duration-300 cursor-pointer"
-        :class="currentIndex === index ? 'bg-primary w-4' : 'bg-gray-300 dark:bg-gray-600 w-2'"
-        @click="goToSlide(index)"></span>
+      <span v-for="index in totalPages" :key="index" class="h-2 rounded transition-all duration-300 cursor-pointer"
+        :class="currentIndex === index - 1 ? 'bg-primary w-4' : 'bg-gray-300 dark:bg-gray-600 w-2'"
+        @click="goToSlide(index - 1)"></span>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref, onMounted, onBeforeUnmount, computed, watch, nextTick } from "vue"
+import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from "vue"
 import WalletCard from '@/components/WalletCard.vue'
 
 const props = defineProps({
@@ -45,32 +44,25 @@ const debounce = (fn, delay = 50) => (...args) => {
   resizeTimeout = setTimeout(() => fn(...args), delay)
 }
 
-const totalPages = computed(() => Math.ceil(props.wallets.length / slidesPerView.value))
-
+// --- Update slides per view based on screen width ---
 const updateSlidesPerView = () => {
-  if (window.innerWidth >= 768) slidesPerView.value = 3
+  if (window.innerWidth >= 1024) slidesPerView.value = 3
+  else if (window.innerWidth >= 768) slidesPerView.value = 3
   else if (window.innerWidth >= 640) slidesPerView.value = 2
   else slidesPerView.value = 1
+  clampIndex()
 }
 
-// Watch slidesPerView and wallets length to clamp currentIndex
-watch([slidesPerView, () => props.wallets.length], () => {
+// --- Total pages for indicators (scrollable positions) ---
+const totalPages = computed(() => Math.max(props.wallets.length - slidesPerView.value + 1, 1))
+
+// --- Clamp index so carousel never overflows ---
+const clampIndex = () => {
   nextTick(() => {
-    const maxIndex = totalPages.value - 1
+    const maxIndex = Math.max(props.wallets.length - slidesPerView.value, 0)
     if (currentIndex.value > maxIndex) currentIndex.value = maxIndex
   })
-})
-
-onMounted(() => {
-  updateSlidesPerView()
-  window.addEventListener("resize", debouncedResize)
-})
-
-onBeforeUnmount(() => {
-  window.removeEventListener("resize", debouncedResize)
-})
-
-const debouncedResize = debounce(updateSlidesPerView)
+}
 
 // --- Swipe logic ---
 const startSwipe = (e) => {
@@ -85,32 +77,34 @@ const swipeMove = (e) => {
 }
 
 const endSwipe = () => {
-  if (!isSwiping.value) {
-    startX.value = 0
-    endX.value = 0
-    return
-  }
-
+  if (!isSwiping.value) return
   const deltaX = startX.value - endX.value
-
-  if (deltaX > 50 && currentIndex.value < totalPages.value - 1) currentIndex.value++
+  if (deltaX > 50 && currentIndex.value < props.wallets.length - slidesPerView.value) currentIndex.value++
   else if (deltaX < -50 && currentIndex.value > 0) currentIndex.value--
-
   startX.value = 0
   endX.value = 0
   isSwiping.value = false
 }
 
-// --- Indicator click ---
+// --- Go to slide when indicator clicked ---
 const goToSlide = (index) => {
-  if (index >= 0 && index < totalPages.value) currentIndex.value = index
+  if (index >= 0 && index <= props.wallets.length - slidesPerView.value) {
+    currentIndex.value = index
+  }
 }
 
-// --- Watch for wallets changes to clamp index ---
-watch(
-  () => props.wallets.length,
-  () => {
-    if (currentIndex.value > totalPages.value - 1) currentIndex.value = totalPages.value - 1
-  }
-)
+// --- Handle resize ---
+const debouncedResize = debounce(updateSlidesPerView)
+
+onMounted(() => {
+  updateSlidesPerView()
+  window.addEventListener("resize", debouncedResize)
+})
+
+onBeforeUnmount(() => {
+  window.removeEventListener("resize", debouncedResize)
+})
+
+// --- Watch wallets length and clamp index ---
+watch(() => props.wallets.length, () => clampIndex())
 </script>

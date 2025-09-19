@@ -1,25 +1,43 @@
+<template>
+  <transition name="fade">
+    <div v-if="show" :class="[
+      'fixed bottom-4 right-4 px-4 py-3 rounded shadow-lg text-white min-w-[200px]',
+      type === 'success' ? 'bg-success' : 'bg-danger'
+    ]">
+      {{ message }}
+    </div>
+  </transition>
+</template>
+
 <script setup>
-defineProps({
-  show: { type: Boolean, default: false },
-  title: { type: String, default: '' }
+import { ref, watch } from 'vue'
+
+const props = defineProps({
+  message: { type: String, required: true },
+  type: { type: String, default: 'success' }, // success | error
+  duration: { type: Number, default: 3000 }
 })
 
-defineEmits(['close'])
+const show = ref(true)
+
+watch(
+  () => props.message,
+  () => {
+    show.value = true
+    setTimeout(() => (show.value = false), props.duration)
+  },
+  { immediate: true }
+)
 </script>
 
-<template>
-  <div v-if="show" class="fixed inset-0 bg-black/40 flex items-center justify-center z-50">
-    <div class="bg-white rounded-lg shadow-lg w-full max-w-md p-6">
-      <div class="flex justify-between items-center mb-4">
-        <h2 class="text-lg font-bold">{{ title }}</h2>
-        <button @click="$emit('close')" class="text-gray-500 hover:text-gray-700">
-          <i class="bi bi-x-lg"></i>
-        </button>
-      </div>
+<style scoped>
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.3s;
+}
 
-      <div>
-        <slot />
-      </div>
-    </div>
-  </div>
-</template>
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
+}
+</style>

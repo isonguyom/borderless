@@ -21,7 +21,7 @@ const wallets = toRef(props, 'wallets')
 const preferredCurrency = toRef(props, 'preferredCurrency')
 
 // Composables
-const { totalInUSD, totalInPreferred } = useTotalBalance(wallets, preferredCurrency)
+const { totalInUSD, totalInPreferred, loading: amountComputing } = useTotalBalance(wallets, preferredCurrency)
 
 // State for toggling balance visibility
 const isVisible = ref(true)
@@ -41,7 +41,8 @@ const isVisible = ref(true)
 
     <!-- Preferred currency display -->
     <div class="text-xl md:text-3xl font-bold mt-2 truncate w-full">
-      <p v-if="isVisible">
+      <p v-if="amountComputing">Computing...</p>
+      <p v-else-if="isVisible">
         {{ formatAmount(totalInPreferred, preferredCurrency) }}
       </p>
       <p v-else>****</p>
@@ -49,6 +50,7 @@ const isVisible = ref(true)
 
     <!-- USD equivalent -->
     <div class="text-gray-500 dark:text-gray-400 w-full truncate">
+      <p v-if="amountComputing">≈</p>
       <p v-if="isVisible">
         ≈ {{ formatAmount(totalInUSD, 'USD') }}
       </p>

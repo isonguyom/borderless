@@ -1,42 +1,113 @@
 {
+  "currencies": [
+    {
+      "value": "USD",
+      "label": "US Dollar",
+      "symbol": "$",
+      "type": "fiat",
+      "color": "#0c325b",
+      "rate": 1
+    },
+    {
+      "value": "NGN",
+      "label": "Nigerian Naira",
+      "symbol": "₦",
+      "type": "fiat",
+      "color": "#008000",
+      "rate": 1500
+    },
+    {
+      "value": "EUR",
+      "label": "Euro",
+      "symbol": "€",
+      "type": "fiat",
+      "color": "#003399",
+      "rate": 0.92
+    },
+    {
+      "value": "GBP",
+      "label": "British Pound",
+      "symbol": "£",
+      "type": "fiat",
+      "color": "#990000",
+      "rate": 0.8
+    },
+    {
+      "value": "USDT",
+      "label": "Tether",
+      "symbol": "₮",
+      "type": "stablecoin",
+      "color": "#26A17B",
+      "rate": 1
+    },
+    {
+      "value": "USDC",
+      "label": "USD Coin",
+      "symbol": "Ⓢ",
+      "type": "stablecoin",
+      "color": "#2775CA",
+      "rate": 1
+    },
+    {
+      "value": "BTC",
+      "label": "Bitcoin",
+      "symbol": "₿",
+      "type": "crypto",
+      "color": "#F7931A",
+      "rate": 0.000027
+    },
+    {
+      "value": "ETH",
+      "label": "Ethereum",
+      "symbol": "Ξ",
+      "type": "crypto",
+      "color": "#3C3C3D",
+      "rate": 0.00041
+    }
+  ],
   "users": [
     {
-      "id": "9eb4",
+      "id": "da27",
       "emailOrPhone": "isonguyom@gmail.com",
-      "createdAt": "2025-09-18T20:42:47.971Z"
+      "createdAt": "2025-09-19T08:36:47.294Z"
     }
   ],
   "tokens": [
     {
-      "id": "2d16",
-      "userId": "9eb4",
-      "token": "mock_1758228168030_z1rouwmkdoi"
+      "id": "0200",
+      "userId": "da27",
+      "token": "mock_1758271007315_4bcs8tnzob4"
+    },
+    {
+      "id": "d038",
+      "userId": "da27",
+      "token": "mock_1758276015395_7pgwz8ukx2t"
     }
   ],
-  "wallet": [
+  "wallets": [
     {
-      "id": "0372",
+      "id": "51fc",
       "currency": "USD",
       "balance": 0,
-      "createdAt": "2025-09-18T23:45:09.305Z"
+      "createdAt": "2025-09-19T09:01:56.381Z"
     },
     {
-      "id": "61e4",
+      "id": "3f4b",
       "currency": "NGN",
-      "balance": 0,
-      "createdAt": "2025-09-18T23:45:09.305Z"
+      "balance": 100,
+      "createdAt": "2025-09-19T09:01:56.381Z"
     },
     {
-      "id": "2e4d",
+      "id": "e049",
       "currency": "EUR",
-      "balance": 0,
-      "createdAt": "2025-09-18T23:45:43.828Z"
+      "balance": 40,
+      "createdAt": "2025-09-19T09:02:09.965Z"
     },
     {
-      "id": "381d",
-      "currency": "USDT",
+      "id": "f801",
+      "currency": "ETH",
       "balance": 0,
-      "createdAt": "2025-09-18T23:57:38.100Z"
+      "createdAt": "2025-09-19T09:21:20.485Z"
     }
   ],
   "transactions": [

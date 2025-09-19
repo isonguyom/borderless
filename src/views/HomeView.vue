@@ -1,8 +1,10 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, computed } from 'vue'
 import { useRouter } from 'vue-router'
+import { storeToRefs } from 'pinia'
+import { useWalletsStore } from '@/stores/wallets'
+import { useCurrenciesStore } from '@/stores/currencies'
 
-import api from '@/utils/api'
 import AppLayout from '@/layouts/AppLayout.vue'
 import WalletsList from '@/components/WalletsList.vue'
 import BalanceCard from '@/components/BalanceCard.vue'
@@ -11,100 +13,96 @@ import ActionButton from '@/components/ActionButton.vue'
 import BaseModal from '@/components/base/BaseModal.vue'
 import BaseSelect from '@/components/base/BaseSelect.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
+import BaseToast from '@/components/base/BaseToast.vue'
 
 const router = useRouter()
 
-// User’s preferred display currency
-const preferredCurrency = ref('NGN')
+// Stores
+const walletStore = useWalletsStore()
+const { wallets, localCurrency, loading: walletLoading, error: walletError } = storeToRefs(walletStore)
+const { fetchWallets, createWallet } = walletStore
 
-// Wallets data
-const wallets = ref([])
+const currenciesStore = useCurrenciesStore()
+const { currencies, loading: currenciesLoading } = storeToRefs(currenciesStore)
+const { fetchCurrencies } = currenciesStore
 
+// Transactions (example data)
 const transactions = ref([
   { id: 1, type: 'Deposit', currency: 'USDT', amount: 500, date: '2025-09-15T10:00:00Z', status: 'Completed' },
   { id: 2, type: 'Swap', currency: 'USDT → USDC', amount: 200, date: '2025-09-14T14:20:00Z', status: 'Pending' },
   { id: 3, type: 'Send', currency: 'USDC', amount: 100, date: '2025-09-12T18:45:00Z', status: 'Failed' }
 ])
 
+// Modal & form state
 const showCreateWallet = ref(false)
 const newWallet = ref({ currency: '' })
-const loading = ref(false)
-const error = ref('')
-// Set your local currency here
-const localCurrency = ref('NGN')
+const formLoading = ref(false)
+const formError = ref('')
 
-// ✅ Supported currencies
-const supportedCurrencies = [
-  { value: 'USD', label: 'US Dollar (USD)' },
-  { value: 'NGN', label: 'Nigerian Naira (NGN)' },
-  { value: 'EUR', label: 'Euro (EUR)' },
-  { value: 'USDT', label: 'Tether (USDT)' },
-  { value: 'USDC', label: 'USD Coin (USDC)' },
-]
+// Toast state
+const toast = ref({ message: '', type: 'success' })
+const showToast = (message, type = 'success', duration = 3000) => {
+  toast.value = { message, type, duration }
+  setTimeout(() => {
+    toast.value = { message: '', type: 'success' }
+  }, duration)
+}
 
+// Fetch wallets & currencies on mount
 onMounted(async () => {
-  const res = await api.get('/wallet')
-  wallets.value = res.data
-
-  // If user has no wallets, provision defaults
-  if (wallets.value.length === 0) {
-    const defaults = [
-      { currency: 'USD', balance: 0, createdAt: new Date().toISOString() },
-      { currency: localCurrency.value, balance: 0, createdAt: new Date().toISOString() } // local currency
-    ]
-
-    for (const wallet of defaults) {
-      const created = await api.post('/wallet', wallet)
-      wallets.value.push(created.data)
-    }
+  try {
+    await fetchWallets()
+    await fetchCurrencies()
+  } catch (err) {
+    showToast(err.message || 'Failed to fetch data', 'error')
   }
 })
 
-
-
-async function handleCreateWallet() {
-  error.value = ''
+// Handle wallet creation
+const handleCreateWallet = async () => {
+  formError.value = ''
   if (!newWallet.value.currency) {
-    error.value = 'Please select a currency'
+    formError.value = 'Please select a currency'
     return
   }
 
-  loading.value = true
+  formLoading.value = true
   try {
-    const res = await api.post('/wallet', {
-      ...newWallet.value,
-      balance: 0, // 👈 enforce 0 starting balance
-      createdAt: new Date().toISOString()
-    })
-    wallets.value.push(res.data)
+    await createWallet(newWallet.value.currency)
     showCreateWallet.value = false
     newWallet.value = { currency: '' }
-  } catch (e) {
-    error.value = e.message || 'Failed to create wallet'
+    showToast('Wallet created successfully!', 'success')
+  } catch (err) {
+    formError.value = err.message || 'Failed to create wallet'
+    showToast(formError.value, 'error')
   } finally {
-    loading.value = false
+    formLoading.value = false
   }
 }
 
+// Navigation actions
+const handleDeposit = () => router.push('/deposit')
+const handleSend = () => router.push('/send')
+const handleSwap = () => router.push('/swap')
 
-function handleDeposit() {
-  router.push('/deposit')
-}
-function handleSend() {
-  router.push('/send')
-}
-function handleSwap() {
-  router.push('/swap')
-}
+// Computed for safe BalanceCard rendering
+const safeWallets = computed(() => wallets.value?.map(w => ({
+  currency: w.currency ?? 'N/A',
+  balance: w.balance ?? 0
+})) ?? [])
 </script>
 
 <template>
   <AppLayout>
     <div class="space-y-8">
+
+      <!-- Balance Card -->
       <div class="w-full space-y-4">
-        <!-- Balance Card -->
-        <BalanceCard :wallets="wallets" :preferred-currency="preferredCurrency"
-          @create-wallet="showCreateWallet = true" />
+        <BalanceCard
+          :wallets="safeWallets"
+          :preferred-currency="localCurrency ?? 'NGN'"
+          @create-wallet="showCreateWallet = true"
+        />
 
         <!-- Actions -->
         <div class="grid grid-cols-3 gap-4">
@@ -115,28 +113,49 @@ function handleSwap() {
       </div>
 
       <!-- Wallet Cards -->
-      <WalletsList :wallets="wallets" />
+      <WalletsList :wallets="wallets ?? []" />
 
       <!-- Transactions List -->
       <div class="space-y-4 pb-8">
-        <TransactionCard v-for="tx in transactions" :key="tx.id" :type="tx.type" :currency="tx.currency"
-          :amount="tx.amount" :date="tx.date" :status="tx.status" />
+        <TransactionCard
+          v-for="tx in transactions"
+          :key="tx.id"
+          :type="tx.type"
+          :currency="tx.currency"
+          :amount="tx.amount"
+          :date="tx.date"
+          :status="tx.status"
+        />
       </div>
 
-      <!-- Modal -->
+      <!-- Modal for creating wallet -->
       <BaseModal v-model="showCreateWallet" title="Create New Wallet">
         <form @submit.prevent="handleCreateWallet" class="space-y-4">
-          <BaseSelect v-model="newWallet.currency" label="Currency" :options="supportedCurrencies"
-            :disabled-options="wallets.map(w => w.currency)" :error="error" />
-
-          <!-- 🚫 Removed Starting Balance input -->
-
-          <BaseButton type="submit" class="w-full" :loading="loading" loading-text="Creating...">
+          <BaseSelect
+            v-model="newWallet.currency"
+            label="Currency"
+            :options="currencies ?? []"
+            :disabled="currenciesLoading || formLoading"
+            :disabled-options="wallets.map(w => w.currency)"
+            :error="formError"
+          />
+          <BaseButton type="submit" class="w-full" :loading="formLoading" loading-text="Creating...">
             Create Wallet
           </BaseButton>
         </form>
       </BaseModal>
 
+      <!-- Toast -->
+      <BaseToast
+        v-if="toast.message"
+        :message="toast.message"
+        :type="toast.type"
+        :duration="toast.duration"
+      />
     </div>
   </AppLayout>
 </template>
+
+<style scoped>
+/* optional styling for the page */
+</style>

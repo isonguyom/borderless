@@ -1,7 +1,7 @@
 <script setup>
 import AppLayout from '@/layouts/AppLayout.vue'
 import { useAuthStore } from '@/stores/auth'
-import { useWalletStore } from '@/stores/wallet'
+import { useWalletStore } from '@/stores/wallets'
 import { ref } from 'vue'
 import { useRouter } from 'vue-router'
 
