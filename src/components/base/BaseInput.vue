@@ -33,7 +33,10 @@ import { computed } from 'vue'
 
 const props = defineProps({
   id: { type: String, default: () => `input-${Math.random().toString(36).slice(2, 7)}` },
-  modelValue: { type: String, default: '' },
+  modelValue: {
+    type: [String, Number, null],
+    default: ''
+  },
   label: { type: String, default: '' },
   placeholder: { type: String, default: '' },
   type: { type: String, default: 'text' },

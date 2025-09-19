@@ -1,21 +1,42 @@
 {
-  "users": [],
-  "tokens": [],
+  "users": [
+    {
+      "id": "9eb4",
+      "emailOrPhone": "isonguyom@gmail.com",
+      "createdAt": "2025-09-18T20:42:47.971Z"
+    }
+  ],
+  "tokens": [
+    {
+      "id": "2d16",
+      "userId": "9eb4",
+      "token": "mock_1758228168030_z1rouwmkdoi"
+    }
+  ],
   "wallet": [
     {
-      "id": "tx_01",
-      "type": "deposit|swap|send",
-      "walletId": "wallet_01",
-      "amount": 100,
-      "currency": "USDC",
-      "status": "pending|confirmed|failed",
-      "meta": {
-        "from": "...",
-        "to": "...",
-        "rate": 1,
-        "fee": 0.5
-      },
-      "createdAt": "2025-09-16T12:05:00Z"
+      "id": "0372",
+      "currency": "USD",
+      "balance": 0,
+      "createdAt": "2025-09-18T23:45:09.305Z"
+    },
+    {
+      "id": "61e4",
+      "currency": "NGN",
+      "balance": 0,
+      "createdAt": "2025-09-18T23:45:09.305Z"
+    },
+    {
+      "id": "2e4d",
+      "currency": "EUR",
+      "balance": 0,
+      "createdAt": "2025-09-18T23:45:43.828Z"
+    },
+    {
+      "id": "381d",
+      "currency": "USDT",
+      "balance": 0,
+      "createdAt": "2025-09-18T23:57:38.100Z"
     }
   ],
   "transactions": [

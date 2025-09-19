@@ -31,7 +31,7 @@ function getInitial(value) {
         aria-label="Notifications">
         <i class="bi bi-bell text-xl" aria-hidden="true"></i>
         <!-- Unread messages indicator -->
-        <span v-if="isUnreadNotifications" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-danger rounded-full"
+        <span v-if="isUnreadNotifications" class="absolute -top-1 -right-1 w-2.5 h-2.5 bg-primary rounded-full"
           role="status" aria-label="You have unread notifications"></span>
       </button>
 
