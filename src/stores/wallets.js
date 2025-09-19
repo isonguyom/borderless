@@ -56,6 +56,74 @@ export const useWalletsStore = defineStore('wallets', () => {
     }
   }
 
+  const depositFunds = async ({ wallet, amount }) => {
+    const walletId = wallet // now this is the actual id
+    const walletObj = wallets.value.find(w => w.id === walletId)
+
+    if (!walletObj) throw new Error(`Wallet not found: ${walletId}`)
+
+    walletObj.balance += Number(amount)
+
+    try {
+      await api.put(`/wallets/${walletId}`, walletObj)
+    } catch (err) {
+      error.value = err.message || 'Failed to update wallet'
+      throw err
+    }
+
+    return walletObj
+  }
+
+ // --- Send funds
+const sendFunds = async ({ wallet, amount, recipient }) => {
+  const walletId = wallet
+  const walletObj = wallets.value.find(w => w.id === walletId)
+
+  if (!walletObj) throw new Error(`Wallet not found: ${walletId}`)
+  if (walletObj.balance < amount) throw new Error('Insufficient balance')
+
+  // Deduct amount
+  walletObj.balance -= Number(amount)
+
+  try {
+    await api.put(`/wallets/${walletId}`, walletObj)
+  } catch (err) {
+    error.value = err.message || 'Failed to update wallet after send'
+    throw err
+  }
+
+  // You can return wallet + recipient info if needed
+  return { ...walletObj, recipient }
+}
+
+// --- Swap funds
+const swapFunds = async ({ fromWallet, toWallet, amount, convertedAmount }) => {
+  const fromWalletObj = wallets.value.find(w => w.id === fromWallet)
+  const toWalletObj = wallets.value.find(w => w.id === toWallet)
+
+  if (!fromWalletObj) throw new Error(`Wallet not found: ${fromWallet}`)
+  if (!toWalletObj) throw new Error(`Wallet not found: ${toWallet}`)
+  if (fromWalletObj.balance < amount) throw new Error('Insufficient balance')
+
+  // Update balances
+  fromWalletObj.balance -= Number(amount)
+  toWalletObj.balance += Number(convertedAmount)
+
+  try {
+    // persist both wallets
+    await Promise.all([
+      api.put(`/wallets/${fromWallet}`, fromWalletObj),
+      api.put(`/wallets/${toWallet}`, toWalletObj),
+    ])
+  } catch (err) {
+    error.value = err.message || 'Failed to update wallets after swap'
+    throw err
+  }
+
+  return { from: fromWalletObj, to: toWalletObj }
+}
+
+
   // Set wallets manually
   const setWallets = (data) => {
     wallets.value = data
@@ -73,6 +141,9 @@ export const useWalletsStore = defineStore('wallets', () => {
     error,
     fetchWallets,
     createWallet,
+    depositFunds,
+    sendFunds,
+    swapFunds,
     setWallets,
     setLocalCurrency
   }

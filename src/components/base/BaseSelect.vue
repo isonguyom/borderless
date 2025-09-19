@@ -1,47 +1,101 @@
+<template>
+  <div class="flex flex-col gap-1 w-full">
+    <!-- Label -->
+    <label v-if="label" :for="id" :class="['text-sm font-medium', labelClasses]">
+      {{ label }}
+    </label>
+
+    <!-- Select wrapper -->
+    <div class="relative flex items-center">
+      <!-- Prefix slot -->
+      <slot name="prefix" />
+
+      <!-- Select -->
+      <select v-bind="$attrs" :id="id" :value="modelValue" :disabled="disabled || loading" @change="onChange"
+        :aria-invalid="!!error" :aria-disabled="disabled || loading" :aria-describedby="error ? `${id}-error` : null"
+        class="w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-offset-1 transition bg-white dark:bg-gray-800"
+        :class="[
+          variantClasses,
+          error
+            ? 'border-danger focus:ring-danger'
+            : disabled || loading
+              ? 'opacity-50 cursor-not-allowed'
+              : 'focus:ring-primary-light hover:border-primary'
+        ]">
+        <option disabled value="">Select...</option>
+        <option v-for="opt in options" :key="opt.value" :value="opt.value"
+          :disabled="disabledOptions.includes(opt.value)" :class="disabled ? 'opacity-60' : 'opacity-100'">
+          {{ opt.label }}
+        </option>
+      </select>
+
+      <!-- optional spinner -->
+      <span v-if="loading" class="absolute right-3 top-1/2 -translate-y-1/2">
+        <i class="bi bi-arrow-repeat animate-spin text-gray-400"></i>
+      </span>
+
+      <!-- Suffix slot -->
+      <slot name="suffix" />
+    </div>
+
+    <!-- Error -->
+    <p v-if="error" :id="`${id}-error`" class="text-danger text-xs" role="alert">
+      {{ error }}
+    </p>
+  </div>
+</template>
+
 <script setup>
-defineProps({
+import { computed } from "vue"
+
+defineOptions({ inheritAttrs: false })
+
+const props = defineProps({
   modelValue: [String, Number],
-  label: String,
+  label: { type: String, default: "" },
   options: {
     type: Array,
     default: () => [],
   },
-  error: {
-    type: String,
-    default: "",
-  },
+  error: { type: String, default: "" },
   disabledOptions: {
     type: Array,
     default: () => [],
   },
-  disabled: Boolean,
+  disabled: { type: Boolean, default: false },
+  loading: { type: Boolean, default: false },
+  variant: { type: String, default: "normal" }, // normal | light | dark
 })
 
 const emit = defineEmits(["update:modelValue"])
 
+const id = `select-${Math.random().toString(36).slice(2, 9)}`
+
+// Emit value on change
 function onChange(event) {
   emit("update:modelValue", event.target.value)
 }
 
-const id = `select-${Math.random().toString(36).slice(2, 9)}`
+// Variant styles
+const variantClasses = computed(() => {
+  switch (props.variant) {
+    case "light":
+      return "border-gray-200/20 bg-gray-300/10 text-light-text"
+    case "dark":
+      return "bg-gray-900/10 text-white border-gray-700/50"
+    default:
+      return "bg-gray-100 border-gray-300 dark:bg-gray-700 dark:border-gray-600"
+  }
+})
+
+const labelClasses = computed(() => {
+  switch (props.variant) {
+    case "light":
+      return "text-gray-300"
+    case "dark":
+      return "text-gray-500"
+    default:
+      return "text-gray-500 dark:text-gray-300"
+  }
+})
 </script>
-
-<template>
-  <div class="w-full">
-    <label v-if="label" :for="id" class="block text-sm font-medium mb-1 text-gray-700 dark:text-gray-300">
-      {{ label }}
-    </label>
-
-    <select :id="id"
-      class="w-full px-3 py-2 rounded border focus:ring-2 focus:ring-primary focus:outline-none dark:bg-dark-surface"
-      :value="modelValue" :disabled="disabled" @change="onChange" :aria-invalid="!!error">
-      <option disabled value="">Select...</option>
-      <option v-for="opt in options" :key="opt.value" :value="opt.value" :disabled="disabledOptions.includes(opt.value)"
-        class="text-gray-900 dark:text-gray-100">
-        {{ opt.label }}
-      </option>
-    </select>
-
-    <p v-if="error" class="text-danger text-sm mt-1">{{ error }}</p>
-  </div>
-</template>

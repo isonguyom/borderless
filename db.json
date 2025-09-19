@@ -69,7 +69,14 @@
     {
       "id": "da27",
       "emailOrPhone": "isonguyom@gmail.com",
-      "createdAt": "2025-09-19T08:36:47.294Z"
+      "createdAt": "2025-09-19T08:36:47.294Z",
+      "notifications": {
+        "email": true,
+        "push": false,
+        "inApp": true
+      },
+      "currency": "USD",
+      "username": "hello1"
     }
   ],
   "tokens": [
@@ -82,32 +89,35 @@
       "id": "d038",
       "userId": "da27",
       "token": "mock_1758276015395_7pgwz8ukx2t"
+    },
+    {
+      "id": "9423",
+      "userId": "da27",
+      "token": "mock_1758289568743_uzrjei4crth"
+    },
+    {
+      "id": "f6df",
+      "userId": "da27",
+      "token": "mock_1758290523931_i0zq5mca5p"
+    },
+    {
+      "id": "4146",
+      "userId": "da27",
+      "token": "mock_1758306298571_9h70fkj5ow"
     }
   ],
   "wallets": [
     {
-      "id": "51fc",
+      "id": "c710",
       "currency": "USD",
-      "balance": 0,
-      "createdAt": "2025-09-19T09:01:56.381Z"
+      "balance": 12,
+      "createdAt": "2025-09-19T13:46:09.474Z"
     },
     {
-      "id": "3f4b",
+      "id": "d1b3",
       "currency": "NGN",
-      "balance": 100,
-      "createdAt": "2025-09-19T09:01:56.381Z"
-    },
-    {
-      "id": "e049",
-      "currency": "EUR",
-      "balance": 40,
-      "createdAt": "2025-09-19T09:02:09.965Z"
-    },
-    {
-      "id": "f801",
-      "currency": "ETH",
       "balance": 0,
-      "createdAt": "2025-09-19T09:21:20.485Z"
+      "createdAt": "2025-09-19T13:46:09.474Z"
     }
   ],
   "transactions": [
@@ -134,6 +144,30 @@
       "amount": 100,
       "date": "2025-09-12T18:45:00Z",
       "status": "Completed"
+    },
+    {
+      "id": "4d5c",
+      "type": "Deposit",
+      "currency": "USD",
+      "amount": "12",
+      "date": "2025-09-19T18:57:21.621Z",
+      "status": "Completed",
+      "source": "bank"
+    }
+  ],
+  "depositAccounts": [
+    {
+      "id": 1758304319226,
+      "type": "Bank Account",
+      "bankName": "First Bank",
+      "accountName": "Account 8902",
+      "accountNumber": "5556788902"
+    },
+    {
+      "id": 1758304424906,
+      "type": "Crypto Wallet",
+      "walletName": "BTC",
+      "address": "0x1234567890ABCDEF"
     }
   ]
 }
