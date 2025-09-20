@@ -14,7 +14,6 @@ function logout() {
 // Define navigation items
 const navItems = [
   { to: '/', label: 'Home', icon: 'bi-house', iconFill: 'bi-house-fill' },
-  { to: '/wallet', label: 'Wallet', icon: 'bi-wallet2', iconFill: 'bi-wallet-fill' },
   { to: '/history', label: 'History', icon: 'bi-clock-history', iconFill: 'bi-clock-fill' },
   { to: '/analytics', label: 'Analytics', icon: 'bi-bar-chart', iconFill: 'bi-bar-chart-fill' },
   { to: '/settings', label: 'Settings', icon: 'bi-gear', iconFill: 'bi-gear-fill' },

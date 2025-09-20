@@ -5,7 +5,7 @@
     <!-- Existing Accounts -->
     <div v-if="accounts.length" class="space-y-3">
       <div v-for="acc in accounts" :key="acc.id"
-        class="relative border border-gray-300 dark:border-gray-700 p-3 rounded-lg text-sm md:text-base">
+        class="relative border border-gray-300 dark:border-gray-700 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 p-3 rounded-lg text-sm md:text-base">
         <div>
           <p class="font-medium">{{ acc.type }}</p>
           <p class="text-sm text-gray-500">

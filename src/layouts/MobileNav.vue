@@ -16,9 +16,9 @@ function logout() {
 
 const navItems = [
   { to: '/', label: 'Home', icon: 'bi-house', iconFill: 'bi-house-fill' },
-  { to: '/wallet', label: 'Wallet', icon: 'bi-wallet2', iconFill: 'bi-wallet-fill' },
   { to: '/history', label: 'History', icon: 'bi-clock-history', iconFill: 'bi-clock-fill' },
   { to: '/analytics', label: 'Analytics', icon: 'bi-bar-chart', iconFill: 'bi-bar-chart-fill' },
+  { to: '/settings', label: 'Settings', icon: 'bi-gear', iconFill: 'bi-gear-fill' },
 ]
 
 // Compute active class and icon variant
@@ -80,7 +80,7 @@ onBeforeUnmount(() => {
       <div v-if="showMore" id="more-menu" role="menu"
         class="absolute bottom-16 left-0 w-full bg-light-surface dark:bg-dark-surface border-t border-gray-300 dark:border-gray-800 shadow-lg">
         <ul class="flex justify-around items-center h-16">
-          <li role="none">
+          <!-- <li role="none">
             <RouterLink to="/settings" role="menuitem" :class="[
               'flex flex-col items-center justify-center',
               isActive('/settings')
@@ -90,7 +90,7 @@ onBeforeUnmount(() => {
               <i :class="`bi ${isActive('/settings') ? 'bi-gear-fill' : 'bi-gear'} text-xl`" aria-hidden="true"></i>
               <span class="text-xs font-medium">Settings</span>
             </RouterLink>
-          </li>
+          </li> -->
           <li role="none">
             <div class="flex flex-col items-center justify-center">
               <DarkModeToggle
