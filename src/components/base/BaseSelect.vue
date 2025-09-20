@@ -13,9 +13,9 @@
       <!-- Select -->
       <select v-bind="$attrs" :id="id" :value="modelValue" :disabled="disabled || loading" @change="onChange"
         :aria-invalid="!!error" :aria-disabled="disabled || loading" :aria-describedby="error ? `${id}-error` : null"
-        class="w-full rounded-lg border px-3 py-2 focus:outline-none focus:ring-2 focus:ring-offset-1 transition bg-white dark:bg-gray-800"
+        class="w-full border focus:outline-none focus:ring-2 focus:ring-offset-1 transition bg-white dark:bg-gray-800"
         :class="[
-          variantClasses,
+          variantClasses, sizeClasses,
           error
             ? 'border-danger focus:ring-danger'
             : disabled || loading
@@ -64,7 +64,8 @@ const props = defineProps({
   },
   disabled: { type: Boolean, default: false },
   loading: { type: Boolean, default: false },
-  variant: { type: String, default: "normal" }, // normal | light | dark
+  variant: { type: String, default: "normal" }, // normal | light | dark,
+  size: { type: String, default: 'md' }
 })
 
 const emit = defineEmits(["update:modelValue"])
@@ -76,6 +77,17 @@ function onChange(event) {
   emit("update:modelValue", event.target.value)
 }
 
+// Size styles
+const sizeClasses = computed(() => {
+  switch (props.size) {
+    case "sm":
+      return "px-2 py-1 text-sm rounded"
+    case "lg":
+      return "px-5 py-3 text-lg rounded-xl"
+    default:
+      return "px-3 py-2 text-base rounded-lg"
+  }
+})
 // Variant styles
 const variantClasses = computed(() => {
   switch (props.variant) {

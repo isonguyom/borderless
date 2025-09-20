@@ -1,49 +1,156 @@
+// /src/stores/fxStore.js
 import { defineStore } from 'pinia'
-import axios from 'axios'
+import { ref } from 'vue'
+import { storeToRefs } from 'pinia'
+import { useCurrenciesStore } from '@/stores/currencies'
 
-function sleep(ms){return new Promise(r=>setTimeout(r,ms))}
+function generateFXData(basePrice = 100, points = 24) {
+  const data = []
+  let price = basePrice
 
-export const useFxStore = defineStore('fx', {
-  state: () => ({
-    rates: {},            // { "USD_EUR": { rate, ts } }
-    loading: false,
-    error: null,
-    ttl: 30 * 1000       // 30s default TTL
-  }),
-  actions: {
-    async fetchRate(pair, { force=false } = {}) {
-      const key = pair.replace('/','_')
-      const cached = this.rates[key]
-      const now = Date.now()
-      if (!force && cached && (now - cached.ts) < this.ttl) return cached.rate
+  for (let i = 0; i < points; i++) {
+    const change = (Math.random() - 0.5) * 2
+    price = Math.max(0, +(price + change).toFixed(2))
 
-      this.loading = true
-      this.error = null
+    const time = new Date(Date.now() - (points - i) * 60 * 60 * 1000)
+    const label = `${time.getHours()}:${time.getMinutes().toString().padStart(2, '0')}`
 
-      // Exponential backoff attempts
-      let attempt = 0
-      const maxAttempt = 3
-      while (attempt < maxAttempt) {
-        try {
-          attempt++
-          // example FX API — replace URL with actual provider
-          const res = await axios.get(`https://api.exchangerate.host/convert?from=${pair.split('/')[0]}&to=${pair.split('/')[1]}`)
-          const rate = res.data?.result ?? null
-          if (!rate) throw new Error('NoRate')
-          this.rates[key] = { rate, ts: Date.now() }
-          this.loading = false
-          return rate
-        } catch (err) {
-          this.error = err.message || 'FX_FETCH_ERROR'
-          const backoff = 200 * Math.pow(2, attempt) // 400, 800ms...
-          await sleep(backoff)
-          // If final attempt, return last-known cached rate (graceful fallback)
-          if (attempt === maxAttempt && cached) {
-            return cached.rate
-          }
-          if (attempt === maxAttempt) throw err
-        }
+    data.push({ time: label, price })
+  }
+  return data
+}
+
+export const useFxStore = defineStore('fx', () => {
+  const currenciesStore = useCurrenciesStore()
+  const { currencies, loading: currenciesLoading, error: currenciesError } = storeToRefs(currenciesStore)
+  const { fetchCurrencies } = currenciesStore
+
+  const fxLoading = ref(false)
+  const performanceLoading = ref(false)
+  const fxError = ref(null)
+  const performanceError = ref(null)
+  const fxData = ref({})
+  const performanceData = ref({})
+
+  // --- Mock data (your existing definitions) ---
+  const mockFXData = {
+    all: ['USD', 'NGN', 'GBP', 'EUR'].reduce((acc, currency) => {
+      acc[currency] = {
+        '1h': generateFXData(500, 24),
+        '1d': generateFXData(505, 24),
+        '3d': generateFXData(500, 72),
+        '1w': generateFXData(510, 7),
+        '1m': generateFXData(500, 30),
+        '3m': generateFXData(520, 90),
+        '1y': generateFXData(500, 12)
+      }
+      return acc
+    }, {}),
+
+    'USD/NGN': {
+      '1h': generateFXData(500, 60),
+      '1d': generateFXData(505, 24),
+      '3d': generateFXData(500, 72),
+      '1w': generateFXData(510, 7),
+      '1m': generateFXData(500, 30),
+      '3m': generateFXData(520, 90),
+      '1y': generateFXData(500, 12)
+    },
+
+    'USD/EUR': {
+      '1h': generateFXData(0.92, 24),
+      '1d': generateFXData(0.92, 24),
+      '3d': generateFXData(0.91, 72),
+      '1w': generateFXData(0.92, 7),
+      '1m': generateFXData(0.93, 30),
+      '3m': generateFXData(0.94, 90),
+      '1y': generateFXData(0.92, 12)
+    }
+  }
+
+  const mockPerformanceData = {
+    all: {
+      USD: {
+        '1h': Array.from({ length: 24 }, (_, i) => ({ time: `${i}:00`, price: +(500 + Math.random() * 5).toFixed(2) })),
+        '1d': Array.from({ length: 24 }, (_, i) => ({ time: `Hour ${i}`, price: +(502 + Math.random() * 8).toFixed(2) })),
+        '3d': Array.from({ length: 72 }, (_, i) => ({ time: `H${i}`, price: +(500 + Math.random() * 15).toFixed(2) })),
+        '1w': Array.from({ length: 7 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(505 + Math.random() * 10).toFixed(2) })),
+        '1m': Array.from({ length: 30 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(500 + Math.random() * 25).toFixed(2) })),
+        '3m': Array.from({ length: 90 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(520 + Math.random() * 30).toFixed(2) })),
+        '1y': Array.from({ length: 12 }, (_, i) => ({ time: `Month ${i + 1}`, price: +(500 + Math.random() * 50).toFixed(2) }))
+      },
+      NGN: {
+        '1h': Array.from({ length: 24 }, (_, i) => ({ time: `${i}:00`, price: +(460 + Math.random() * 5).toFixed(2) })),
+        '1d': Array.from({ length: 24 }, (_, i) => ({ time: `Hour ${i}`, price: +(462 + Math.random() * 8).toFixed(2) })),
+        '3d': Array.from({ length: 72 }, (_, i) => ({ time: `H${i}`, price: +(460 + Math.random() * 15).toFixed(2) })),
+        '1w': Array.from({ length: 7 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(465 + Math.random() * 10).toFixed(2) })),
+        '1m': Array.from({ length: 30 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(460 + Math.random() * 25).toFixed(2) })),
+        '3m': Array.from({ length: 90 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(480 + Math.random() * 30).toFixed(2) })),
+        '1y': Array.from({ length: 12 }, (_, i) => ({ time: `Month ${i + 1}`, price: +(460 + Math.random() * 50).toFixed(2) }))
+      },
+      GBP: {
+        '1h': Array.from({ length: 24 }, (_, i) => ({ time: `${i}:00`, price: +(0.75 + Math.random() * 0.02).toFixed(4) })),
+        '1d': Array.from({ length: 24 }, (_, i) => ({ time: `Hour ${i}`, price: +(0.76 + Math.random() * 0.03).toFixed(4) })),
+        '3d': Array.from({ length: 72 }, (_, i) => ({ time: `H${i}`, price: +(0.75 + Math.random() * 0.05).toFixed(4) })),
+        '1w': Array.from({ length: 7 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(0.76 + Math.random() * 0.03).toFixed(4) })),
+        '1m': Array.from({ length: 30 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(0.75 + Math.random() * 0.05).toFixed(4) })),
+        '3m': Array.from({ length: 90 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(0.77 + Math.random() * 0.05).toFixed(4) })),
+        '1y': Array.from({ length: 12 }, (_, i) => ({ time: `Month ${i + 1}`, price: +(0.75 + Math.random() * 0.1).toFixed(4) }))
+      },
+      EUR: {
+        '1h': Array.from({ length: 24 }, (_, i) => ({ time: `${i}:00`, price: +(0.88 + Math.random() * 0.02).toFixed(4) })),
+        '1d': Array.from({ length: 24 }, (_, i) => ({ time: `Hour ${i}`, price: +(0.89 + Math.random() * 0.03).toFixed(4) })),
+        '3d': Array.from({ length: 72 }, (_, i) => ({ time: `H${i}`, price: +(0.88 + Math.random() * 0.05).toFixed(4) })),
+        '1w': Array.from({ length: 7 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(0.89 + Math.random() * 0.03).toFixed(4) })),
+        '1m': Array.from({ length: 30 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(0.88 + Math.random() * 0.05).toFixed(4) })),
+        '3m': Array.from({ length: 90 }, (_, i) => ({ time: `Day ${i + 1}`, price: +(0.90 + Math.random() * 0.05).toFixed(4) })),
+        '1y': Array.from({ length: 12 }, (_, i) => ({ time: `Month ${i + 1}`, price: +(0.88 + Math.random() * 0.1).toFixed(4) }))
       }
     }
+  }
+
+  // --- Mocked "API calls" ---
+  const fetchFXData = async () => {
+    fxLoading.value = true
+    fxError.value = null
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000)) // simulate API delay
+      fxData.value = mockFXData
+    } catch {
+      fxError.value = "Failed to load FX data"
+    } finally {
+      fxLoading.value = false
+    }
+  }
+
+  const fetchPerformanceData = async () => {
+    performanceLoading.value = true
+    performanceError.value = null
+    try {
+      await new Promise(resolve => setTimeout(resolve, 1000)) // simulate API delay
+      performanceData.value = mockPerformanceData
+    } catch {
+      performanceError.value = "Failed to load Performance data"
+    } finally {
+      performanceLoading.value = false
+    }
+  }
+
+
+  return {
+    fxLoading,
+    fxError,
+    fxData,
+    mockFXData,
+    performanceLoading,
+    performanceError,
+    performanceData,
+    mockPerformanceData,
+    currencies,
+    currenciesLoading,
+    currenciesError,
+    fetchFXData,
+    fetchCurrencies,
+    fetchPerformanceData
   }
 })

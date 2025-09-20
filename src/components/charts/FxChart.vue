@@ -39,8 +39,9 @@ const selectedTab = ref('1h')
 
 const selectedPair = ref('all')
 const compareFrom = ref('USD')
-const compareTo = ref('EUR')
+const compareTo = ref('NGN')
 const compareResult = ref(null)
+const isLoadingCompare = ref(false)
 
 const chartData = ref({ labels: [], datasets: [] })
 
@@ -52,7 +53,17 @@ const chartOptions = {
   responsive: true,
   maintainAspectRatio: false,
   plugins: {
-    legend: { position: 'top' },
+    legend: {
+      position: 'top',
+      labels: {
+        boxWidth: 15,   // custom box size
+        padding: 10,    // space between legend items
+        font: {
+          size: 12,     // legend font size
+          weight: '500'
+        }
+      }
+    },
     tooltip: { enabled: true }
   },
   scales: {
@@ -106,11 +117,18 @@ const updateChartData = () => {
   }
 }
 
-// --- Updated compare handler ---
-const handleCompare = () => {
+
+
+const handleCompare = async () => {
   const from = props.currencies.find(c => c.value === compareFrom.value)
   const to = props.currencies.find(c => c.value === compareTo.value)
   if (!from || !to) return
+
+  isLoadingCompare.value = true
+  compareResult.value = null
+
+  // simulate network / heavy calculation delay
+  await new Promise(resolve => setTimeout(resolve, 1500))
 
   const rate = to.rate / from.rate
   compareResult.value = `1 ${from.value} = ${rate.toFixed(4)} ${to.value}`
@@ -138,7 +156,9 @@ const handleCompare = () => {
   }
 
   isCompareMode.value = true
+  isLoadingCompare.value = false
 }
+
 
 
 // Reset compare mode when switching pair or tab
@@ -150,38 +170,45 @@ watch([selectedTab, selectedPair], () => {
 
 
 <template>
-  <div class="w-full h-auto">
+  <div class="w-full bg-gray-200 dark:bg-gray-900 rounded-2xl shadow p-4 lg:p-6">
     <!-- Currency Selector -->
-    <div class="flex gap-2 mb-4">
+    <div class="flex gap-1 mb-4">
       <button v-for="pair in Object.keys(props.data)" :key="pair" @click="selectedPair = pair"
-        :class="['px-3 py-1 rounded-md uppercase', { 'bg-primary text-white': selectedPair === pair, 'bg-gray-200 hover:bg-primary/50': selectedPair !== pair }]">
+        :class="['px-3 py-1 rounded-md uppercase cursor-pointer font-medium text-xs md:text-sm', { 'bg-primary text-white': selectedPair === pair, 'bg-white dark:bg-gray-800 hover:bg-primary/50': selectedPair !== pair }]">
         {{ pair }}
       </button>
     </div>
 
     <!-- Currency Comparison -->
-    <!-- Currency Comparison -->
-    <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6">
-      <h2 class="text-lg font-semibold mb-4">Compare Currencies</h2>
-      <div class="flex flex-col md:flex-row md:gap-4 gap-2 items-center">
-        <BaseSelect v-model="compareFrom" :options="currencies ?? []" label="From" />
-        <BaseSelect v-model="compareTo" :options="currencies ?? []" label="To" />
-        <BaseButton @click="handleCompare">Compare</BaseButton>
+    <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 mb-6 md:mb-8">
+      <h2 class="text-sm md:text-base font-medium mb-4">Compare Currencies</h2>
+      <div class="flex flex-row md:gap-4 gap-2 items-end">
+        <BaseSelect v-model="compareFrom" :options="currencies ?? []" label="From" size="sm"
+          :disabled="isLoadingCompare" />
+        <BaseSelect v-model="compareTo" :options="currencies ?? []" label="To" size="sm" :disabled="isLoadingCompare" />
+        <BaseButton :loading="isLoadingCompare" @click="handleCompare" size="sm" loading-text="Comparing...">
+          Compare
+        </BaseButton>
       </div>
-      <p v-if="compareResult" class="mt-2 text-gray-700 dark:text-gray-200 font-medium">
+      <p v-if="compareResult" class="mt-3 text-gray-700 dark:text-gray-200 font-medium">
         {{ compareResult }}
       </p>
     </section>
 
 
     <!-- Line Chart -->
-    <div class="w-full h-70">
+    <div class="relative w-full h-55 md:h-70">
       <Line :data="chartData" :options="chartOptions" />
+      <div v-if="isLoadingCompare"
+        class="absolute inset-0 bg-white/70 dark:bg-gray-900/70 flex items-center justify-center text-sm font-medium">
+        Comparing...
+      </div>
     </div>
+
     <!-- Timeframe Tabs -->
-    <div class="flex justify-center gap-2 mt-4">
+    <div class="flex justify-center gap-1 md:gap-2 mt-4">
       <button v-for="tab in timeTabs" :key="tab.value" @click="selectedTab = tab.value"
-        :class="['px-3 py-1 rounded-md', { 'bg-indigo-600 text-white': selectedTab === tab.value, 'bg-gray-200': selectedTab !== tab.value }]">
+        :class="['p-1 rounded font-medium text-xs md:text-sm cursor-pointer', { 'bg-primary text-white': selectedTab === tab.value, 'bg-white dark:bg-gray-800 hover:bg-primary/50': selectedTab !== tab.value }]">
         {{ tab.label }}
       </button>
     </div>

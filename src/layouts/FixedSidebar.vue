@@ -34,7 +34,7 @@ function isActive(path) {
 
     <!-- Navigation -->
     <nav class="flex-1 space-y-1">
-      <ul>
+      <ul class="flex flex-col gap-y-3">
         <li v-for="item in navItems" :key="item.to">
           <RouterLink :to="item.to" :class="[
             'flex items-center gap-2 px-3 py-2 rounded-md font-medium transition',
@@ -50,7 +50,7 @@ function isActive(path) {
     </nav>
 
     <div
-      class="w-full flex flex-col gap-y-2 bg-light-surface dark:bg-dark-surface border border-gray-300 dark:border-gray-700 shadow-lg p-4 rounded-xl">
+      class="w-full flex flex-col gap-y-3 bg-light-surface dark:bg-dark-surface border border-gray-300 dark:border-gray-700 shadow-lg p-4 rounded-xl">
 
       <DarkModeToggle
         class="px-3 py-2 rounded-md flex items-center gap-2 font-medium cursor-pointer text-gray-500 dark:text-gray-400 hover:text-primary">
