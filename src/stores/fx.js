@@ -25,8 +25,8 @@ export const useFxStore = defineStore('fx', () => {
   const { currencies, loading: currenciesLoading, error: currenciesError } = storeToRefs(currenciesStore)
   const { fetchCurrencies } = currenciesStore
 
-  const fxLoading = ref(false)
-  const performanceLoading = ref(false)
+  const fxLoading = ref(true)
+  const performanceLoading = ref(true)
   const fxError = ref(null)
   const performanceError = ref(null)
   const fxData = ref({})

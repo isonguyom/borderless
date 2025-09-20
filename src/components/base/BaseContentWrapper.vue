@@ -31,7 +31,8 @@ defineProps({
     <BaseLoadingState v-if="loading" />
 
     <!-- Error -->
-    <BaseErrorState v-else-if="error" :details="errorState" :retry="retry" />
+    <BaseErrorState v-else-if="error && error.length > 0" :details="errorState" :retry="retry" />
+
 
     <!-- Empty -->
     <BaseEmptyState v-else-if="!items ||

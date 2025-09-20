@@ -17,6 +17,7 @@ import BaseSelect from '@/components/base/BaseSelect.vue'
 import BaseButton from '@/components/base/BaseButton.vue'
 import BaseToast from '@/components/base/BaseToast.vue'
 import BaseInput from '@/components/base/BaseInput.vue'
+import BaseContentWrapper from '@/components/base/BaseContentWrapper.vue'
 
 // --- Stores ---
 const walletStore = useWalletsStore()
@@ -244,12 +245,27 @@ const handleSwap = async () => {
       <WalletsList :wallets="wallets ?? []" />
 
       <!-- Transactions -->
-      <div class="space-y-4 pb-8">
-        <p v-if="txLoading">Loading transactions...</p>
-        <p v-if="txError" class="text-red-500">{{ txError }}</p>
-        <TransactionCard v-for="tx in sortedTransactions" :key="tx.id" v-bind="tx" />
-      </div>
+      <div class="pb-8">
 
+        <h2 class="md:text-lg font-medium mb-4">Recent Transactions</h2>
+
+        <BaseContentWrapper :items="transactions.slice(0, 7)" :loading="txLoading" :error="txError" :empty-state="{
+          title: 'No transactions found',
+          description: 'You do not have any transactions at the moment. Check back soon.'
+        }">
+          <div class="space-y-2">
+            <TransactionCard v-for="tx in transactions.slice(0, 7)" :key="tx.id" :tx="tx" />
+          </div>
+        </BaseContentWrapper>
+
+        <div class="flex justify-end mt-3">
+          <router-link v-if="transactions.length > 7" to="/history"
+            class="text-primary hover:underline text-sm font-medium">
+            See more
+          </router-link>
+        </div>
+
+      </div>
       <!-- Create Wallet Modal -->
       <BaseModal v-model="modals.createWallet" title="Create Wallet">
         <form @submit.prevent="handleCreateWallet" class="space-y-4">

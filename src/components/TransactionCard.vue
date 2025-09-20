@@ -2,25 +2,25 @@
 import { computed } from 'vue'
 
 const props = defineProps({
-  type: { type: String, required: true }, // Deposit, Send, Swap
-  currency: { type: String, required: true },
-  amount: { type: [Number, String], required: true },
-  date: { type: String, required: true },
-  status: { type: String, default: 'Completed' }
+  tx: {
+    type: Object,
+    default: () => ({})
+  }
 })
-
-
 
 // Format date nicely
 const formattedDate = computed(() => {
-  const d = new Date(props.date)
-  return d.toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
-  })
+  if (!props.tx?.date) return "Unknown date"
+  const d = new Date(props.tx.date)
+  return isNaN(d)
+    ? "Invalid date"
+    : d.toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
 })
 
 // Map transaction type to icon
@@ -30,15 +30,22 @@ const typeIcons = {
   Swap: 'bi-arrow-left-right'
 }
 
+// Format amount
+function formatAmount(value) {
+  if (value == null || isNaN(value)) return "0.00"
+  return Number(value).toFixed(2)
+}
+
+
 // Status badge styles
 const statusClass = computed(() => {
-  switch (props.status) {
+  switch (props.tx?.status) {
     case 'Completed':
-      return 'bg-green-100 text-green-700'
+      return 'bg-green-100 text-success'
     case 'Pending':
-      return 'bg-yellow-100 text-yellow-700'
+      return 'bg-yellow-100 text-warning'
     case 'Failed':
-      return 'bg-red-100 text-red-700'
+      return 'bg-red-100 text-danger'
     default:
       return 'bg-gray-100 text-gray-700'
   }
@@ -47,17 +54,18 @@ const statusClass = computed(() => {
 
 <template>
   <div
-    class="flex items-center justify-between rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-4 shadow-sm hover:shadow-md transition">
+    class="flex items-center justify-between gap-3 text-sm rounded-2xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 p-2 md:p-4 shadow-sm hover:shadow-md transition">
+
     <!-- Left: Icon + details -->
-    <div class="flex items-center gap-3">
-      <div class="w-12 h-12 flex items-center justify-center rounded-full bg-gray-100">
-        <i :class="`bi ${typeIcons[type] || 'bi-receipt'} text-xl text-primary`"></i>
+    <div class="flex items-center gap-1 md:gap-2">
+      <div class="w-10 h-10 md:w-12 md:h-12 flex items-center justify-center rounded-full bg-gray-200 dark:bg-gray-700">
+        <i :class="`bi ${typeIcons[tx.type] || 'bi-receipt'} text-xl text-primary`"></i>
       </div>
-      <div>
+      <div class="flex-1">
         <p class="font-medium text-gray-900 dark:text-gray-100">
-          {{ type }} • {{ currency }}
+          {{ tx.type || "Unknown" }} • {{ tx.currency || "N/A" }}
         </p>
-        <p class="text-sm text-gray-500 dark:text-gray-400">
+        <p class="text-xs md:text-sm text-gray-500 dark:text-gray-400">
           {{ formattedDate }}
         </p>
       </div>
@@ -66,10 +74,10 @@ const statusClass = computed(() => {
     <!-- Right: Amount + status -->
     <div class="flex flex-col items-end">
       <p class="font-semibold text-gray-900 dark:text-gray-100">
-        {{ amount }}
+        {{ formatAmount(tx?.amount) }}
       </p>
-      <span class="mt-1 px-2 py-0.5 rounded-full text-xs font-medium" :class="statusClass">
-        {{ status }}
+      <span class="mt-1 px-2 py-0.5 rounded-full text-xs md:text-sm font-medium" :class="statusClass">
+        {{ tx.status || "Unknown" }}
       </span>
     </div>
   </div>

@@ -5,37 +5,48 @@ import api from '@/utils/api'
 
 export const useTransactionsStore = defineStore('transactions', () => {
   const transactions = ref([])
-  const loading = ref(false)
+  const loading = ref(true)
   const error = ref('')
 
-  // Fetch all transactions for the authenticated user
-const fetchTransactions = async () => {
-  loading.value = true
-  error.value = ''
-  try {
-    const res = await api.get('/transactions')
-    // reverse so newest comes first
-    transactions.value = res.data.sort(
-      (a, b) => new Date(b.date) - new Date(a.date)
-    )
-  } catch (err) {
-    error.value = err.message || 'Failed to fetch transactions'
-  } finally {
-    loading.value = false
+  const normalizeTx = (tx) => ({
+    id: tx.id,
+    type: tx.type,
+    currency: tx.currency,
+    amount: tx.amount,
+    date: tx.date,
+    status: tx.status || 'Pending',
+  })
+
+  const fetchTransactions = async () => {
+    loading.value = true
+    error.value = ''
+    try {
+      const res = await api.get('/transactions')
+      const data = Array.isArray(res.data) ? res.data : []
+      transactions.value = data.map(normalizeTx).sort(
+        (a, b) => new Date(b.date) - new Date(a.date)
+      )
+    } catch (err) {
+      error.value = err.message || 'Failed to fetch transactions'
+    } finally {
+      loading.value = false
+    }
   }
-}
 
-
-  // Persist new transaction + update store
   const addTransaction = async (tx) => {
     try {
       const res = await api.post('/transactions', tx)
-      transactions.value.unshift(res.data) // API should return the created transaction
+      transactions.value.unshift(normalizeTx(res.data))
       return res.data
     } catch (err) {
       error.value = err.message || 'Failed to add transaction'
       throw err
     }
+  }
+
+  const resetTransactions = () => {
+    transactions.value = []
+    error.value = ''
   }
 
   return {
@@ -44,5 +55,6 @@ const fetchTransactions = async () => {
     error,
     fetchTransactions,
     addTransaction,
+    resetTransactions,
   }
 })
