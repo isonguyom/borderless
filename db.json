@@ -74,42 +74,82 @@
     }
   ],
   "users": [
-
+    {
+      "id": "d198",
+      "emailOrPhone": "isonguyom@gmail.com",
+      "currency": "GBP",
+      "username": "SilentLion480",
+      "notifications": {
+        "email": true,
+        "push": false,
+        "inApp": true
+      },
+      "createdAt": "2025-09-21T13:23:45.384Z"
+    }
   ],
   "tokens": [
-
+    {
+      "id": "8d43",
+      "userId": "d198",
+      "token": "mock_1758461025420_70eq7qriwm"
+    }
   ],
   "wallets": [
-   
+    {
+      "id": "f4c1",
+      "currency": "USD",
+      "balance": 9,
+      "createdAt": "2025-09-21T13:42:05.910Z"
+    },
+    {
+      "id": "678a",
+      "currency": "NGN",
+      "balance": 1500,
+      "createdAt": "2025-09-21T13:42:05.910Z"
+    },
+    {
+      "id": "8230",
+      "currency": "GBP",
+      "balance": 0,
+      "createdAt": "2025-09-21T13:42:12.811Z"
+    }
   ],
   "transactions": [
     {
-      "id": "1",
+      "id": "c30f",
       "type": "Deposit",
-      "currency": "USDT",
-      "amount": 500,
-      "date": "2025-09-15T10:00:00Z",
-      "status": "Completed"
+      "currency": "USD",
+      "amount": "20",
+      "date": "2025-09-21T13:42:46.839Z",
+      "status": "Completed",
+      "account": "1758461146790"
     },
     {
-      "id": "2",
-      "type": "Swap",
-      "currency": "USDT → USDC",
-      "amount": 200,
-      "date": "2025-09-14T14:20:00Z",
-      "status": "Pending"
-    },
-    {
-      "id": "3",
+      "id": "3591",
       "type": "Send",
-      "currency": "USDC",
-      "amount": 100,
-      "date": "2025-09-12T18:45:00Z",
+      "currency": "USD",
+      "amount": "10",
+      "date": "2025-09-21T13:43:12.777Z",
+      "status": "Completed",
+      "recipient": "yuhlgj;khln;m.'k/l\\"
+    },
+    {
+      "id": "95a7",
+      "type": "Swap",
+      "currency": "USD → NGN",
+      "amount": "1",
+      "convertedAmount": 1500,
+      "date": "2025-09-21T13:43:46.266Z",
       "status": "Completed"
     }
-    
   ],
   "depositAccounts": [
-    
+    {
+      "id": "1758461146790",
+      "type": "Bank Account",
+      "bankName": "First Bank",
+      "accountName": "Account 7890",
+      "accountNumber": "1234567890"
+    }
   ]
 }

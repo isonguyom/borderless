@@ -36,10 +36,6 @@ const routes = [
     component: () => import('@/views/WalletView.vue'),
     meta: { requiresAuth: true }
   },
-  { path: '/wallet/create', name: 'CreateWallet', component: () => import('@/views/CreateWalletView.vue'), meta: { requiresAuth: true } },
-  { path: '/deposit', name: 'Deposit', component: () => import('@/views/DepositView.vue'), meta: { requiresAuth: true } },
-  { path: '/swap', name: 'Swap', component: () => import('@/views/SwapView.vue'), meta: { requiresAuth: true } },
-  { path: '/send', name: 'Send', component: () => import('@/views/SendView.vue'), meta: { requiresAuth: true } },
   { path: '/settings', name: 'Settings', component: () => import('@/views/SettingsView.vue'), meta: { requiresAuth: true } },
 
 ]

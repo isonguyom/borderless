@@ -287,13 +287,15 @@ Object.keys(forms.value).forEach((formKey) => {
       () => forms.value[formKey][fieldKey],
       (newVal) => {
         if (newVal) {
-          errors.value[formKey][fieldKey] = ''
+          if (!errors.value[formKey]) {
+            errors.value[formKey] = {}     // ✅ ensure object exists
+          }
+          errors.value[formKey][fieldKey] = ''  // ✅ safe assignment
         }
       }
     )
   })
 })
-
 
 // --- Lifecycle ---
 onMounted(async () => {
