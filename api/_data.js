@@ -1,4 +1,3 @@
-// api/_data.js
 let db = {
   currencies: [
     { value: "USD", label: "US Dollar", symbol: "$", type: "fiat", color: "#0c325b", rate: 1 },
@@ -10,13 +9,15 @@ let db = {
   tokens: [],
   wallets: [],
   transactions: [],
-  depositAccounts: []
+  depositAccounts: [],
 }
 
+// Getter
 export function getDb() {
   return db
 }
 
+// Mutator
 export function setDb(newDb) {
   db = newDb
 }

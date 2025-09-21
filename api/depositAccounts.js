@@ -1,17 +1,41 @@
-import { getDb } from './_data.js'
+import { getDb, setDb } from './_data.js'
 
 export default function handler(req, res) {
+  const { method, query, body } = req
+  const id = query.id
   const db = getDb()
+  let accounts = db.depositAccounts || []
 
-  if (req.method === 'GET') {
-    return res.status(200).json(db.depositAccounts)
+  if (method === 'GET') {
+    if (id) {
+      const account = accounts.find((a) => a.id === id)
+      if (!account) return res.status(404).json({ error: 'Account not found' })
+      return res.status(200).json(account)
+    }
+    return res.status(200).json(accounts)
   }
 
-  if (req.method === 'POST') {
-    const acc = { id: Date.now().toString(), ...req.body }
-    db.depositAccounts.push(acc)
-    return res.status(201).json(acc)
+  if (method === 'POST') {
+    const account = { id: Date.now().toString(36), ...body }
+    accounts.push(account)
+    setDb({ ...db, depositAccounts: accounts })
+    return res.status(201).json(account)
   }
 
-  return res.status(405).json({ error: 'Method not allowed' })
+  if (method === 'PATCH') {
+    if (!id) return res.status(400).json({ error: 'Missing id' })
+    accounts = accounts.map((a) => (a.id === id ? { ...a, ...body } : a))
+    setDb({ ...db, depositAccounts: accounts })
+    const updated = accounts.find((a) => a.id === id)
+    return res.status(200).json(updated)
+  }
+
+  if (method === 'DELETE') {
+    if (!id) return res.status(400).json({ error: 'Missing id' })
+    accounts = accounts.filter((a) => a.id !== id)
+    setDb({ ...db, depositAccounts: accounts })
+    return res.status(200).json({ success: true })
+  }
+
+  return res.status(405).json({ error: `Method ${method} Not Allowed` })
 }
