@@ -101,40 +101,22 @@
   ],
   "wallets": [
     {
-      "id": "ee6f",
+      "id": "6703",
       "currency": "USD",
-      "balance": 30,
-      "createdAt": "2025-09-21T14:11:13.275Z"
+      "balance": 22,
+      "createdAt": "2025-09-21T19:07:32.808Z"
     },
     {
-      "id": "a66f",
+      "id": "f2ab",
       "currency": "NGN",
-      "balance": 15000,
-      "createdAt": "2025-09-21T14:11:13.275Z"
+      "balance": 0,
+      "createdAt": "2025-09-21T19:07:32.808Z"
     },
     {
-      "id": "fe81",
+      "id": "1a9b",
       "currency": "EUR",
       "balance": 0,
-      "createdAt": "2025-09-21T14:11:39.393Z"
-    },
-    {
-      "id": "1b5b",
-      "currency": "USDT",
-      "balance": 0,
-      "createdAt": "2025-09-21T14:34:47.433Z"
-    },
-    {
-      "id": "4904",
-      "currency": "GBP",
-      "balance": 0,
-      "createdAt": "2025-09-21T15:19:07.342Z"
-    },
-    {
-      "id": "dff7",
-      "currency": "USDC",
-      "balance": 0,
-      "createdAt": "2025-09-21T15:19:21.285Z"
+      "createdAt": "2025-09-21T19:07:40.034Z"
     }
   ],
   "transactions": [
@@ -171,6 +153,15 @@
       "currency": "USD",
       "amount": "20",
       "date": "2025-09-21T15:25:03.861Z",
+      "status": "Completed",
+      "account": "1758465501354"
+    },
+    {
+      "id": "1630",
+      "type": "Deposit",
+      "currency": "USD",
+      "amount": "22",
+      "date": "2025-09-21T19:14:51.140Z",
       "status": "Completed",
       "account": "1758465501354"
     }
