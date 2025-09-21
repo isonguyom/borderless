@@ -1,6 +1,12 @@
 {
-    "rewrites": [
-      { "source": "/(.*)", "destination": "/index.html" }
-    ]
-  }
-  
+  "rewrites": [
+    { "source": "/api/users/:id", "destination": "/api/users?id=:id" },
+    { "source": "/api/wallets/:id", "destination": "/api/wallets?id=:id" },
+    { "source": "/api/tokens/:id", "destination": "/api/tokens?id=:id" },
+    { "source": "/api/transactions/:id", "destination": "/api/transactions?id=:id" },
+    { "source": "/api/depositAccounts/:id", "destination": "/api/depositAccounts?id=:id" },
+    { "source": "/api/currencies/:id", "destination": "/api/currencies?id=:id" },
+
+    { "source": "/(.*)", "destination": "/index.html" }
+  ]
+}

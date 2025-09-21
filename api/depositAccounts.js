@@ -30,10 +30,10 @@ export default function handler(req, res) {
     return res.status(200).json(updated)
   }
 
-  if (req.method === 'DELETE') {
-    const { id } = req.query
-    db.depositAccounts = db.depositAccounts.filter(acc => acc.id !== id)
-    setDb(db)
+  if (method === 'DELETE') {
+    if (!id) return res.status(400).json({ error: 'Missing id' })
+    accounts = accounts.filter((a) => a.id !== id)
+    setDb({ ...db, depositAccounts: accounts })
     return res.status(200).json({ success: true })
   }
 
