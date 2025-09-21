@@ -92,7 +92,8 @@ export const useAuthStore = defineStore('auth', () => {
   async function fetchUser() {
     if (!user.value) return null
 
-    const res = await api.get(`/users/${user.value.id}`)
+    const res = await api.get(`/users`, { params: { id: user.value.id } })
+
     user.value = res.data
     saveSession()
     return res.data
