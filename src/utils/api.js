@@ -6,14 +6,36 @@ const api = axios.create({
   headers: { 'Content-Type': 'application/json' },
 })
 
-// 🔥 Interceptor to normalize ID-based requests
+// Collections we want to normalize
+const collections = [
+  'wallets',
+  'users',
+  'tokens',
+  'transactions',
+  'depositAccounts',
+  'currencies'
+]
+
+// 🔥 Interceptor: normalize query-style requests to RESTful style
 api.interceptors.request.use((config) => {
-  // If the request is PATCH or DELETE with ?id= in the URL,
-  // rewrite it to use /:id path (so it works locally & deployed)
-  if ((config.method === 'patch' || config.method === 'delete' || config.method === 'put') && config.url.includes('?id=')) {
-    const [base, query] = config.url.split('?id=')
-    const id = query.split('&')[0] // just take the first id
-    config.url = `${base}/${id}`
+  for (const col of collections) {
+    const pattern = new RegExp(`^/${col}\\?id=([^&]+)`)
+    const match = config.url.match(pattern)
+
+    if (match) {
+      const id = match[1]
+
+      if (config.method === 'post') {
+        throw new Error(
+          `❌ Invalid request: POST with '?id=' is not allowed. Use POST /${col} without id.`
+        )
+      }
+
+      if (['patch', 'put', 'delete', 'get'].includes(config.method)) {
+        config.url = `/${col}/${id}`
+      }
+      break
+    }
   }
   return config
 })
