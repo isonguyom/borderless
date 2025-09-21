@@ -44,6 +44,16 @@ This project prioritizes **frontend-first development**, with a focus on UX, sta
 
 ---
 
+##  Tech Stack
+- **Framework:** Vue 3 (Vite)
+- **State Management:** Pinia
+- **UI:** TailwindCSS
+- **Charts:** Chart.js
+- **API:** Axios + Mock REST API (Vercel Functions)
+- **Deployment:** Vercel
+- **Testing:** Vitest  + Cypress
+
+---
 
 ## Project Setup
 
