@@ -31,8 +31,9 @@ const usdEquivalent = computed(() => {
   return convert(props.wallet.balance, props.wallet.currency, 'USD')
 })
 
-
 const currencyObj = computed(() => {
+  // Ensure currencies exist and wallet has a currency
+  if (!props.currencies?.length || !props.wallet?.currency) return {}
   return normalizeCurrency(props.wallet.currency, props.currencies) || {}
 })
 
