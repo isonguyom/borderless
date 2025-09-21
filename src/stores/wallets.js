@@ -1,3 +1,4 @@
+// stores/wallets.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/utils/api'
@@ -10,7 +11,7 @@ export const useWalletsStore = defineStore('wallets', () => {
   const loading = ref(true)
   const error = ref('')
 
-  // Fetch wallets from API
+  // --- Fetch wallets
   const fetchWallets = async () => {
     loading.value = true
     error.value = ''
@@ -36,7 +37,7 @@ export const useWalletsStore = defineStore('wallets', () => {
     }
   }
 
-  // Create a new wallet
+  // --- Create wallet
   const createWallet = async (currency) => {
     loading.value = true
     error.value = ''
@@ -56,8 +57,9 @@ export const useWalletsStore = defineStore('wallets', () => {
     }
   }
 
+  // --- Deposit
   const depositFunds = async ({ wallet, amount }) => {
-    const walletId = wallet // now this is the actual id
+    const walletId = wallet
     const walletObj = wallets.value.find(w => w.id === walletId)
 
     if (!walletObj) throw new Error(`Wallet not found: ${walletId}`)
@@ -65,7 +67,7 @@ export const useWalletsStore = defineStore('wallets', () => {
     walletObj.balance += Number(amount)
 
     try {
-      await api.put(`/wallets/${walletId}`, walletObj)
+      await api.patch(`/wallets?id=${walletId}`, walletObj)
     } catch (err) {
       error.value = err.message || 'Failed to update wallet'
       throw err
@@ -82,17 +84,15 @@ export const useWalletsStore = defineStore('wallets', () => {
     if (!walletObj) throw new Error(`Wallet not found: ${walletId}`)
     if (walletObj.balance < amount) throw new Error('Insufficient balance')
 
-    // Deduct amount
     walletObj.balance -= Number(amount)
 
     try {
-      await api.put(`/wallets/${walletId}`, walletObj)
+      await api.patch(`/wallets?id=${walletId}`, walletObj)
     } catch (err) {
       error.value = err.message || 'Failed to update wallet after send'
       throw err
     }
 
-    // You can return wallet + recipient info if needed
     return { ...walletObj, recipient }
   }
 
@@ -105,15 +105,13 @@ export const useWalletsStore = defineStore('wallets', () => {
     if (!toWalletObj) throw new Error(`Wallet not found: ${toWallet}`)
     if (fromWalletObj.balance < amount) throw new Error('Insufficient balance')
 
-    // Update balances
     fromWalletObj.balance -= Number(amount)
     toWalletObj.balance += Number(convertedAmount)
 
     try {
-      // persist both wallets
       await Promise.all([
-        api.put(`/wallets/${fromWallet}`, fromWalletObj),
-        api.put(`/wallets/${toWallet}`, toWalletObj),
+        api.patch(`/wallets?id=${fromWallet}`, fromWalletObj),
+        api.patch(`/wallets?id=${toWallet}`, toWalletObj),
       ])
     } catch (err) {
       error.value = err.message || 'Failed to update wallets after swap'
@@ -123,13 +121,10 @@ export const useWalletsStore = defineStore('wallets', () => {
     return { from: fromWalletObj, to: toWalletObj }
   }
 
-
-  // Set wallets manually
+  // --- Setters
   const setWallets = (data) => {
     wallets.value = data
   }
-
-  // Set local currency
   const setLocalCurrency = (currency) => {
     localCurrency.value = currency
   }

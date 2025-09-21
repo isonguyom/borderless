@@ -81,7 +81,7 @@
       "username": "SwiftPanther159",
       "notifications": {
         "email": true,
-        "push": false,
+        "push": true,
         "inApp": true
       },
       "createdAt": "2025-09-21T14:11:26.684Z"
@@ -103,13 +103,13 @@
     {
       "id": "6703",
       "currency": "USD",
-      "balance": 22,
+      "balance": 17,
       "createdAt": "2025-09-21T19:07:32.808Z"
     },
     {
       "id": "f2ab",
       "currency": "NGN",
-      "balance": 0,
+      "balance": 7500,
       "createdAt": "2025-09-21T19:07:32.808Z"
     },
     {
@@ -117,6 +117,18 @@
       "currency": "EUR",
       "balance": 0,
       "createdAt": "2025-09-21T19:07:40.034Z"
+    },
+    {
+      "id": "9d5a",
+      "currency": "GBP",
+      "balance": 0,
+      "createdAt": "2025-09-21T19:31:17.393Z"
+    },
+    {
+      "id": "56b1",
+      "currency": "USDT",
+      "balance": 0,
+      "createdAt": "2025-09-21T19:38:11.017Z"
     }
   ],
   "transactions": [
@@ -164,6 +176,33 @@
       "date": "2025-09-21T19:14:51.140Z",
       "status": "Completed",
       "account": "1758465501354"
+    },
+    {
+      "id": "f9fe",
+      "type": "Deposit",
+      "currency": "USD",
+      "amount": "10",
+      "date": "2025-09-21T19:37:46.817Z",
+      "status": "Completed",
+      "account": "1758465501354"
+    },
+    {
+      "id": "3134",
+      "type": "Send",
+      "currency": "USD",
+      "amount": "10",
+      "date": "2025-09-21T19:40:18.225Z",
+      "status": "Completed",
+      "recipient": "sdxfcgvhbjkl"
+    },
+    {
+      "id": "6f16",
+      "type": "Swap",
+      "currency": "USD → NGN",
+      "amount": "5",
+      "convertedAmount": 7500,
+      "date": "2025-09-21T19:40:45.592Z",
+      "status": "Completed"
     }
   ],
   "depositAccounts": [

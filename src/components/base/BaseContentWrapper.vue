@@ -5,7 +5,7 @@ import BaseErrorState from "@/components/base/BaseErrorState.vue"
 
 defineProps({
   loading: { type: Boolean, default: false },
-  error: { type: Boolean, default: false },
+   error: { type: [Boolean, String], default: false },
   items: { type: [Array, Object], default: () => [] },
   errorState: {
     type: Object,
