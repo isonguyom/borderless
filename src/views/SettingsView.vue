@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, onMounted, watchEffect } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useWalletsStore } from '@/stores/wallets'
 import { useCurrenciesStore } from '@/stores/currencies'
@@ -29,6 +29,7 @@ const { fetchAccounts, addAccount, removeAccount } = depositAccountsStore
 
 const authStore = useAuthStore()
 const { fetchUser, updateProfile } = authStore
+const { user } = storeToRefs(authStore)
 
 // --- Profile form state ---
 const profileForm = ref({
@@ -52,21 +53,6 @@ const showToast = (message, type = 'success', duration = 3000) => {
     toast.value = { message: '', type: 'success', duration: 3000 }
   }, duration)
 }
-
-// --- Lifecycle ---
-onMounted(async () => {
-  await fetchCurrencies()
-  await fetchAccounts()
-
-  const latestUser = await fetchUser()
-  if (latestUser) {
-    profileForm.value = {
-      ...profileForm.value,
-      ...latestUser,
-      notifications: latestUser.notifications ?? profileForm.value.notifications
-    }
-  }
-})
 
 // --- Handlers ---
 const handleSaveProfileSettings = async () => {
@@ -100,6 +86,26 @@ const handleRemoveAccount = async (id) => {
   }
 }
 
+
+// Populate profileForm whenever `user` in the store changes
+watchEffect(() => {
+  if (user.value) {
+    profileForm.value = {
+      ...profileForm.value,
+      currency: user.value.currency ?? profileForm.value.currency,
+      username: user.value.username ?? profileForm.value.username,
+      emailOrPhone: user.value.emailOrPhone ?? profileForm.value.emailOrPhone,
+      notifications: user.value.notifications ?? profileForm.value.notifications,
+    }
+  }
+})
+
+// --- Lifecycle ---
+onMounted(async () => {
+  await fetchCurrencies()
+  await fetchAccounts()
+
+})
 </script>
 
 <template>
