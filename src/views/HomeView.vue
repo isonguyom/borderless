@@ -105,6 +105,13 @@ const depositAccountOptions = computed(() => {
         type: acc.type
       }
     }
+    if (acc.type === 'Card') {
+      return {
+        value: acc.id,
+        label: `${acc.cardType} - (${acc.cardName})`,
+        type: acc.type
+      }
+    }
     return {
       value: acc.id,
       label: acc.type,

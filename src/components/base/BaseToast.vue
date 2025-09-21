@@ -1,7 +1,7 @@
 <template>
   <transition name="fade">
     <div v-if="show" role="alert" :class="[
-      'fixed px-4 py-3 rounded-2xl shadow-lg text-white min-w-[200px] flex items-center justify-between gap-2',
+      'fixed px-4 py-3 z-50 rounded-2xl shadow-lg text-white min-w-[200px] flex items-center justify-between gap-2',
       typeClasses,
       positionClasses
     ]">

@@ -74,64 +74,13 @@
     }
   ],
   "users": [
-    {
-      "id": "da27",
-      "emailOrPhone": "isonguyom@gmail.com",
-      "createdAt": "2025-09-19T08:36:47.294Z",
-      "notifications": {
-        "email": true,
-        "push": false,
-        "inApp": true
-      },
-      "currency": "USD",
-      "username": "hello1"
-    }
+
   ],
   "tokens": [
-    {
-      "id": "0200",
-      "userId": "da27",
-      "token": "mock_1758271007315_4bcs8tnzob4"
-    },
-    {
-      "id": "d038",
-      "userId": "da27",
-      "token": "mock_1758276015395_7pgwz8ukx2t"
-    },
-    {
-      "id": "9423",
-      "userId": "da27",
-      "token": "mock_1758289568743_uzrjei4crth"
-    },
-    {
-      "id": "f6df",
-      "userId": "da27",
-      "token": "mock_1758290523931_i0zq5mca5p"
-    },
-    {
-      "id": "4146",
-      "userId": "da27",
-      "token": "mock_1758306298571_9h70fkj5ow"
-    },
-    {
-      "id": "dedd",
-      "userId": "da27",
-      "token": "mock_1758399909132_fbgzo064q17"
-    }
+
   ],
   "wallets": [
-    {
-      "id": "2f97",
-      "currency": "USD",
-      "balance": 54,
-      "createdAt": "2025-09-20T21:51:16.968Z"
-    },
-    {
-      "id": "8d31",
-      "currency": "NGN",
-      "balance": 2500,
-      "createdAt": "2025-09-20T21:51:16.968Z"
-    }
+   
   ],
   "transactions": [
     {
@@ -157,97 +106,10 @@
       "amount": 100,
       "date": "2025-09-12T18:45:00Z",
       "status": "Completed"
-    },
-    {
-      "id": "4d5c",
-      "type": "Deposit",
-      "currency": "USD",
-      "amount": "12",
-      "date": "2025-09-19T18:57:21.621Z",
-      "status": "Completed",
-      "source": "bank"
-    },
-    {
-      "id": "cf85",
-      "type": "Deposit",
-      "currency": "USD",
-      "amount": "55555",
-      "date": "2025-09-20T16:48:46.599Z",
-      "status": "Completed",
-      "source": "bank"
-    },
-    {
-      "id": "01ba",
-      "type": "Send",
-      "currency": "USD",
-      "amount": "333",
-      "date": "2025-09-20T16:49:08.677Z",
-      "status": "Completed",
-      "recipient": "44444444444"
-    },
-    {
-      "id": "10f6",
-      "type": "Send",
-      "currency": "USD",
-      "amount": "4444",
-      "date": "2025-09-20T16:49:37.804Z",
-      "status": "Completed",
-      "recipient": "fffffffff"
-    },
-    {
-      "id": "bea9",
-      "type": "Deposit",
-      "currency": "USD",
-      "amount": "55",
-      "date": "2025-09-20T22:55:38.417Z",
-      "status": "Completed",
-      "source": "bank"
-    },
-    {
-      "id": "1b38",
-      "type": "Deposit",
-      "currency": "USD",
-      "amount": "10",
-      "date": "2025-09-20T23:51:56.065Z",
-      "status": "Completed",
-      "account": "1758304319226"
-    },
-    {
-      "id": "c862",
-      "type": "Deposit",
-      "currency": "NGN",
-      "amount": "1000",
-      "date": "2025-09-21T00:35:44.497Z",
-      "status": "Completed",
-      "account": "1758304319226"
-    },
-    {
-      "id": "c7b8",
-      "type": "Send",
-      "currency": "USD",
-      "amount": "10",
-      "date": "2025-09-21T00:44:33.493Z",
-      "status": "Completed",
-      "recipient": "55555555555555"
-    },
-    {
-      "id": "01f3",
-      "type": "Swap",
-      "currency": "USD → NGN",
-      "amount": "1",
-      "convertedAmount": 1500,
-      "date": "2025-09-21T00:44:49.307Z",
-      "status": "Completed"
-    },
-    {
-      "id": "25b9",
-      "type": "Swap",
-      "currency": "USD → USD",
-      "amount": "1",
-      "convertedAmount": 1,
-      "date": "2025-09-21T00:44:59.976Z",
-      "status": "Completed"
     }
+    
   ],
-  "depositAccounts": []
+  "depositAccounts": [
+    
+  ]
 }

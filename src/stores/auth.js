@@ -31,7 +31,7 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const payload = {
-      emailOrPhone, currency: localCurrency, username: generateRandomUsername(), notifications: {
+      emailOrPhone, currency: localCurrency.value, username: generateRandomUsername(), notifications: {
         email: true,
         push: false,
         inApp: true

@@ -17,9 +17,7 @@ import DepositAccounts from '@/components/DepositAccounts.vue'
 
 // --- Stores ---
 const walletStore = useWalletsStore()
-const { localCurrency } = storeToRefs(walletStore)
 const { setLocalCurrency } = walletStore
-
 
 const currenciesStore = useCurrenciesStore()
 const { currencies, loading: currenciesLoading } = storeToRefs(currenciesStore)
@@ -30,10 +28,9 @@ const { accounts, loading: depositAccountsLoading } = storeToRefs(depositAccount
 const { fetchAccounts, addAccount, removeAccount } = depositAccountsStore
 
 const authStore = useAuthStore()
-const { user } = storeToRefs(authStore)
 const { fetchUser, updateProfile } = authStore
 
-// --- UI State ---
+// --- Profile form state ---
 const profileForm = ref({
   currency: '',
   username: '',
@@ -42,60 +39,61 @@ const profileForm = ref({
     email: true,
     push: false,
     inApp: true
-
-  },
-
+  }
 })
 
-
-const toast = ref({ message: '', type: 'success' })
+// --- Toast state ---
+const toast = ref({ message: '', type: 'success', duration: 3000 })
+let toastTimeout
 const showToast = (message, type = 'success', duration = 3000) => {
+  clearTimeout(toastTimeout)
   toast.value = { message, type, duration }
-  setTimeout(() => (toast.value = { message: '', type: 'success' }), duration)
+  toastTimeout = setTimeout(() => {
+    toast.value = { message: '', type: 'success', duration: 3000 }
+  }, duration)
 }
 
 // --- Lifecycle ---
 onMounted(async () => {
   await fetchCurrencies()
   await fetchAccounts()
+
   const latestUser = await fetchUser()
   if (latestUser) {
     profileForm.value = {
+      ...profileForm.value,
       ...latestUser,
-      notifications: latestUser.notifications || { email: true, push: false, inApp: true }
+      notifications: latestUser.notifications ?? profileForm.value.notifications
     }
-
   }
-
 })
 
 // --- Handlers ---
 const handleSaveProfileSettings = async () => {
   try {
     if (!profileForm.value.currency) throw new Error('Preferred currency is required')
+
     await updateProfile(profileForm.value)
     setLocalCurrency(profileForm.value.currency)
+
     showToast('Settings saved successfully!')
   } catch (err) {
     showToast(err.message || 'Failed to save settings', 'error')
   }
 }
 
-
-// Add account
 const handleAddAccount = async (account) => {
   try {
-    await addAccount(account) // call store action which hits API
+    await addAccount(account)
     showToast('Account added successfully!')
   } catch (err) {
     showToast(err.message || 'Failed to add account', 'error')
   }
 }
 
-// Remove account
 const handleRemoveAccount = async (id) => {
   try {
-    await removeAccount(id) // call store action which hits API
+    await removeAccount(id) // updates store + backend
     showToast('Account removed successfully!')
   } catch (err) {
     showToast(err.message || 'Failed to remove account', 'error')
@@ -107,19 +105,20 @@ const handleRemoveAccount = async (id) => {
 <template>
   <AppLayout>
     <div class="w-full mx-auto pb-8 space-y-8">
-      <h1 class="text-2xl font-bold">Settings</h1>
+      <!-- Page Title -->
       <h2 class="text-lg md:text-xl font-semibold">Settings</h2>
+
+      <!-- Profile Settings -->
       <form @submit.prevent="handleSaveProfileSettings" class="space-y-3" novalidate>
-        <!-- Profile Settings -->
         <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6 space-y-4">
           <h2 class="text-sm md:text-base font-medium">Profile</h2>
 
           <div class="space-y-3">
             <BaseInput v-model="profileForm.emailOrPhone" type="text" label="Email or Phone"
-              placeholder="Enter email" />
+              placeholder="Enter email or phone" />
             <BaseInput v-model="profileForm.username" type="text" label="Username" placeholder="Enter username" />
             <BaseSelect v-model="profileForm.currency" :options="currencies ?? []" :disabled="currenciesLoading"
-              label="Select Local Currency" />
+              label="Preferred Currency" />
           </div>
         </section>
 
@@ -130,7 +129,6 @@ const handleRemoveAccount = async (id) => {
             <BaseSwitch v-model="profileForm.notifications.email" label="Email Notifications" />
             <BaseSwitch v-model="profileForm.notifications.push" label="Push Notifications" />
             <BaseSwitch v-model="profileForm.notifications.inApp" label="In-App Notifications" />
-
           </div>
         </section>
 
@@ -140,7 +138,10 @@ const handleRemoveAccount = async (id) => {
         </div>
       </form>
 
-      <DepositAccounts :accounts="accounts" @add-account="handleAddAccount" @remove-account="handleRemoveAccount" />
+      <!-- Deposit Accounts -->
+      <DepositAccounts :accounts="accounts" :loading="depositAccountsLoading" @add-account="handleAddAccount"
+        @remove-account="handleRemoveAccount" />
+
       <!-- Toast -->
       <BaseToast v-if="toast.message" :message="toast.message" :type="toast.type" :duration="toast.duration" />
     </div>

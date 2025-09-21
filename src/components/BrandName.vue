@@ -48,9 +48,9 @@ const uid = Math.random().toString(36).slice(2, 9)
 
 /* color system */
 const COLORS = {
-  primary: { start: '#7C3AED', end: '#4C1D95', text: '#0F172A', highlight: '#ffffff' },
-  light: { start: '#A78BFA', end: '#C4B5FD', text: '#111827', highlight: '#ffffff' },
-  dark: { start: '#2E1065', end: '#1A063F', text: '#FFFFFF', highlight: '#FFFFFF' }
+  primary: { start: '#2B6FA3', end: '#1C4B70', text: '#0F172A', highlight: '#ffffff' },
+  light: { start: '#52AAE8', end: '#2B6FA3', text: '#111827', highlight: '#ffffff' },
+  dark: { start: '#1C4B70', end: '#2B6FA3', text: '#FFFFFF', highlight: '#FFFFFF' }
 }
 
 const variant = props.variant in COLORS ? props.variant : 'primary'

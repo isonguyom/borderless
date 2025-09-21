@@ -102,6 +102,7 @@ import BaseContentWrapper from "./base/BaseContentWrapper.vue"
 
 defineProps({
   accounts: { type: Array, required: true },
+  accountLoading: { type: Boolean, default: false }
 })
 const emits = defineEmits(["add-account", "remove-account"])
 
@@ -271,7 +272,11 @@ const submitForm = () => {
 
   // Simulate API call
   setTimeout(() => {
-    const account = { ...newAccount.value, id: Date.now() }
+    const account = {
+      ...newAccount.value,
+      id: String(Date.now()), // force ID to be a string
+    };
+
 
     // For card: only keep last4
     if (account.type === "Card" && account.cardNumber) {
