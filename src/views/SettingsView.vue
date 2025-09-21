@@ -106,20 +106,26 @@ const handleRemoveAccount = async (id) => {
 
 <template>
   <AppLayout>
-    <div class="max-w-3xl mx-auto py-8 space-y-8">
+    <div class="w-full mx-auto pb-8 space-y-8">
       <h1 class="text-2xl font-bold">Settings</h1>
+      <h2 class="text-lg md:text-xl font-semibold">Settings</h2>
       <form @submit.prevent="handleSaveProfileSettings" class="space-y-3" novalidate>
         <!-- Profile Settings -->
-        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
-          <BaseInput v-model="profileForm.emailOrPhone" type="text" label="Email or Phone" placeholder="Enter email" />
-          <BaseInput v-model="profileForm.username" type="text" label="Username" placeholder="Enter username" />
-          <BaseSelect v-model="profileForm.currency" :options="currencies ?? []" :disabled="currenciesLoading"
-            label="Select Local Currency" />
+        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6 space-y-4">
+          <h2 class="text-sm md:text-base font-medium">Profile</h2>
+
+          <div class="space-y-3">
+            <BaseInput v-model="profileForm.emailOrPhone" type="text" label="Email or Phone"
+              placeholder="Enter email" />
+            <BaseInput v-model="profileForm.username" type="text" label="Username" placeholder="Enter username" />
+            <BaseSelect v-model="profileForm.currency" :options="currencies ?? []" :disabled="currenciesLoading"
+              label="Select Local Currency" />
+          </div>
         </section>
 
         <!-- Notification Preferences -->
-        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-4">
-          <h2 class="text-lg font-semibold">Notifications</h2>
+        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6 space-y-4">
+          <h2 class="text-sm md:text-base font-medium">Notifications</h2>
           <div class="space-y-3">
             <BaseSwitch v-model="profileForm.notifications.email" label="Email Notifications" />
             <BaseSwitch v-model="profileForm.notifications.push" label="Push Notifications" />

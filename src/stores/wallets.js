@@ -7,7 +7,7 @@ export const useWalletsStore = defineStore('wallets', () => {
   const localCurrency = ref('NGN')
 
   // Loading and error states
-  const loading = ref(false)
+  const loading = ref(true)
   const error = ref('')
 
   // Fetch wallets from API
@@ -74,54 +74,54 @@ export const useWalletsStore = defineStore('wallets', () => {
     return walletObj
   }
 
- // --- Send funds
-const sendFunds = async ({ wallet, amount, recipient }) => {
-  const walletId = wallet
-  const walletObj = wallets.value.find(w => w.id === walletId)
+  // --- Send funds
+  const sendFunds = async ({ wallet, amount, recipient }) => {
+    const walletId = wallet
+    const walletObj = wallets.value.find(w => w.id === walletId)
 
-  if (!walletObj) throw new Error(`Wallet not found: ${walletId}`)
-  if (walletObj.balance < amount) throw new Error('Insufficient balance')
+    if (!walletObj) throw new Error(`Wallet not found: ${walletId}`)
+    if (walletObj.balance < amount) throw new Error('Insufficient balance')
 
-  // Deduct amount
-  walletObj.balance -= Number(amount)
+    // Deduct amount
+    walletObj.balance -= Number(amount)
 
-  try {
-    await api.put(`/wallets/${walletId}`, walletObj)
-  } catch (err) {
-    error.value = err.message || 'Failed to update wallet after send'
-    throw err
+    try {
+      await api.put(`/wallets/${walletId}`, walletObj)
+    } catch (err) {
+      error.value = err.message || 'Failed to update wallet after send'
+      throw err
+    }
+
+    // You can return wallet + recipient info if needed
+    return { ...walletObj, recipient }
   }
 
-  // You can return wallet + recipient info if needed
-  return { ...walletObj, recipient }
-}
+  // --- Swap funds
+  const swapFunds = async ({ fromWallet, toWallet, amount, convertedAmount }) => {
+    const fromWalletObj = wallets.value.find(w => w.id === fromWallet)
+    const toWalletObj = wallets.value.find(w => w.id === toWallet)
 
-// --- Swap funds
-const swapFunds = async ({ fromWallet, toWallet, amount, convertedAmount }) => {
-  const fromWalletObj = wallets.value.find(w => w.id === fromWallet)
-  const toWalletObj = wallets.value.find(w => w.id === toWallet)
+    if (!fromWalletObj) throw new Error(`Wallet not found: ${fromWallet}`)
+    if (!toWalletObj) throw new Error(`Wallet not found: ${toWallet}`)
+    if (fromWalletObj.balance < amount) throw new Error('Insufficient balance')
 
-  if (!fromWalletObj) throw new Error(`Wallet not found: ${fromWallet}`)
-  if (!toWalletObj) throw new Error(`Wallet not found: ${toWallet}`)
-  if (fromWalletObj.balance < amount) throw new Error('Insufficient balance')
+    // Update balances
+    fromWalletObj.balance -= Number(amount)
+    toWalletObj.balance += Number(convertedAmount)
 
-  // Update balances
-  fromWalletObj.balance -= Number(amount)
-  toWalletObj.balance += Number(convertedAmount)
+    try {
+      // persist both wallets
+      await Promise.all([
+        api.put(`/wallets/${fromWallet}`, fromWalletObj),
+        api.put(`/wallets/${toWallet}`, toWalletObj),
+      ])
+    } catch (err) {
+      error.value = err.message || 'Failed to update wallets after swap'
+      throw err
+    }
 
-  try {
-    // persist both wallets
-    await Promise.all([
-      api.put(`/wallets/${fromWallet}`, fromWalletObj),
-      api.put(`/wallets/${toWallet}`, toWalletObj),
-    ])
-  } catch (err) {
-    error.value = err.message || 'Failed to update wallets after swap'
-    throw err
+    return { from: fromWalletObj, to: toWalletObj }
   }
-
-  return { from: fromWalletObj, to: toWalletObj }
-}
 
 
   // Set wallets manually

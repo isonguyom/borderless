@@ -1,6 +1,5 @@
 <template>
   <div class="relative w-full overflow-hidden">
-    <h2 class="md:text-lg font-medium mb-2">Wallets</h2>
 
     <!-- Carousel Wrapper -->
     <div ref="carousel" class="flex transition-transform duration-500 ease-in-out"
@@ -8,7 +7,7 @@
       @touchmove="swipeMove" @touchend="endSwipe">
       <div v-for="wallet in wallets" :key="wallet.currency" class="flex-shrink-0 px-2"
         :style="{ width: `${100 / slidesPerView}%` }">
-        <WalletCard :wallet="wallet" :highlight="wallet.currency === 'USDT'" />
+        <WalletCard :wallet="wallet" :highlight="wallet.currency === 'USDT'" :currencies="currencies" />
       </div>
     </div>
 
@@ -26,7 +25,8 @@ import { ref, onMounted, onBeforeUnmount, watch, nextTick, computed } from "vue"
 import WalletCard from '@/components/WalletCard.vue'
 
 const props = defineProps({
-  wallets: { type: Array, required: true }
+  wallets: { type: Array, required: true },
+  currencies: { type: Array }
 })
 
 const currentIndex = ref(0)

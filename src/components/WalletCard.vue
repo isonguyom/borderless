@@ -1,7 +1,8 @@
 <script setup>
-import { computed } from 'vue'
+import { ref, computed } from 'vue'
 import { formatAmount } from '@/composables/formatAmount'
 import { useCurrencyConverter } from '@/composables/currencyConverter'
+import { normalizeCurrency } from '@/composables/currencyNormalizer'
 
 const props = defineProps({
   wallet: {
@@ -11,14 +12,16 @@ const props = defineProps({
       type: '',
       balance: 0,
       currency: '',
-      equivalentUSD: null
     })
   },
+  currencies: { type: Array, default: () => [] },
   highlight: { type: Boolean, default: false }
 })
 
 // Composable
 const { convert } = useCurrencyConverter()
+
+const isVisible = ref(true)
 
 // Always ensure we have a USD equivalent
 const usdEquivalent = computed(() => {
@@ -27,28 +30,58 @@ const usdEquivalent = computed(() => {
   }
   return convert(props.wallet.balance, props.wallet.currency, 'USD')
 })
+
+
+const currencyObj = computed(() => {
+  return normalizeCurrency(props.wallet.currency, props.currencies) || {}
+})
+
+
 </script>
 
 <template>
   <div
-    class="bg-gray-200 dark:bg-gray-800 border border-gray-100 dark:border-gray-800 shadow-md rounded-xl p-5 flex flex-col gap-2 transition hover:shadow-lg"
+    class="bg-primary/40 border border-gray-100 dark:border-gray-800 shadow-md rounded-xl p-5 flex flex-col gap-2 transition hover:border-primary hover:shadow-lg"
     :class="highlight ? '' : ''">
     <!-- Wallet Type -->
     <div class="flex items-center justify-between">
-      <h3 class="text-lg font-semibold text-gray-800 dark:text-gray-200">
+      <h3 class="text-lg font-semibold text-gray-700 dark:text-gray-300 flex-1">
         {{ wallet.currency }}
       </h3>
-      <i class="bi bi-wallet2 text-primary text-xl"></i>
+
+
+      <div class="w-10 h-10 flex justify-center items-center rounded-full"
+        :style="{ backgroundColor: currencyObj?.color || '#ccc' }">
+        <i class="bi bi-wallet2 text-white text-xl"></i>
+      </div>
+
     </div>
 
-    <!-- Balance -->
-    <p class="text-xl md:text-2xl font-bold text-gray-900 dark:text-gray-100">
-      {{ formatAmount(wallet.balance, wallet.currency) }}
-    </p>
+    <div class="flex justify-between items-end gap-3">
+      <div>
+        <!-- Balance -->
+        <div class="text-sm md:text-base font-bold">
+          <p v-if="isVisible">
+            {{ formatAmount(wallet.balance, '') }}
+          </p>
+          <p v-else>****</p>
+        </div>
 
-    <!-- Equivalent in USD -->
-    <p class="text-sm text-gray-500 dark:text-gray-400">
-      ≈ {{ formatAmount(usdEquivalent, 'USD') }}
-    </p>
+        <!-- Equivalent in USD -->
+        <div class="text-xs text-gray-500 dark:text-gray-400">
+          <p v-if="isVisible">
+            ≈ {{ formatAmount(usdEquivalent, 'USD') }}
+          </p>
+          <p v-else class="font-bold">....</p>
+        </div>
+      </div>
+
+      <!-- Toggle button -->
+      <button @click="isVisible = !isVisible"
+        class="text-gray-600 dark:text-gray-400 hover:text-primary transition cursor-pointer"
+        :aria-label="isVisible ? 'Hide balances' : 'Show balances'">
+        <i :class="`bi ${isVisible ? 'bi-eye-slash' : 'bi-eye'} `"></i>
+      </button>
+    </div>
   </div>
 </template>

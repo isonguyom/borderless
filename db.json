@@ -112,20 +112,25 @@
       "id": "4146",
       "userId": "da27",
       "token": "mock_1758306298571_9h70fkj5ow"
+    },
+    {
+      "id": "dedd",
+      "userId": "da27",
+      "token": "mock_1758399909132_fbgzo064q17"
     }
   ],
   "wallets": [
     {
-      "id": "c710",
+      "id": "2f97",
       "currency": "USD",
-      "balance": 50790,
-      "createdAt": "2025-09-19T13:46:09.474Z"
+      "balance": 54,
+      "createdAt": "2025-09-20T21:51:16.968Z"
     },
     {
-      "id": "d1b3",
+      "id": "8d31",
       "currency": "NGN",
-      "balance": 0,
-      "createdAt": "2025-09-19T13:46:09.474Z"
+      "balance": 2500,
+      "createdAt": "2025-09-20T21:51:16.968Z"
     }
   ],
   "transactions": [
@@ -188,21 +193,61 @@
       "date": "2025-09-20T16:49:37.804Z",
       "status": "Completed",
       "recipient": "fffffffff"
-    }
-  ],
-  "depositAccounts": [
-    {
-      "id": "1758304319226",
-      "type": "Bank Account",
-      "bankName": "First Bank",
-      "accountName": "Account 8902",
-      "accountNumber": "5556788902"
     },
     {
-      "id": "1758304424906",
-      "type": "Crypto Wallet",
-      "walletName": "BTC",
-      "address": "0x1234567890ABCDEF"
+      "id": "bea9",
+      "type": "Deposit",
+      "currency": "USD",
+      "amount": "55",
+      "date": "2025-09-20T22:55:38.417Z",
+      "status": "Completed",
+      "source": "bank"
+    },
+    {
+      "id": "1b38",
+      "type": "Deposit",
+      "currency": "USD",
+      "amount": "10",
+      "date": "2025-09-20T23:51:56.065Z",
+      "status": "Completed",
+      "account": "1758304319226"
+    },
+    {
+      "id": "c862",
+      "type": "Deposit",
+      "currency": "NGN",
+      "amount": "1000",
+      "date": "2025-09-21T00:35:44.497Z",
+      "status": "Completed",
+      "account": "1758304319226"
+    },
+    {
+      "id": "c7b8",
+      "type": "Send",
+      "currency": "USD",
+      "amount": "10",
+      "date": "2025-09-21T00:44:33.493Z",
+      "status": "Completed",
+      "recipient": "55555555555555"
+    },
+    {
+      "id": "01f3",
+      "type": "Swap",
+      "currency": "USD → NGN",
+      "amount": "1",
+      "convertedAmount": 1500,
+      "date": "2025-09-21T00:44:49.307Z",
+      "status": "Completed"
+    },
+    {
+      "id": "25b9",
+      "type": "Swap",
+      "currency": "USD → USD",
+      "amount": "1",
+      "convertedAmount": 1,
+      "date": "2025-09-21T00:44:59.976Z",
+      "status": "Completed"
     }
-  ]
+  ],
+  "depositAccounts": []
 }

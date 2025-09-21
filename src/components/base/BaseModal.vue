@@ -16,7 +16,7 @@ const sizeClasses = {
 
 <template>
   <transition name="fade">
-    <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50" role="dialog"
+    <div v-if="modelValue" class="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4" role="dialog"
       aria-modal="true" :aria-labelledby="title ? 'modal-title' : null">
       <div :class="['bg-white dark:bg-dark-surface rounded-xl shadow-lg w-full p-6', sizeClasses[size]]">
         <header class="flex justify-between items-center mb-4">

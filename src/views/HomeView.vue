@@ -1,8 +1,9 @@
 <script setup>
-import { ref, onMounted, computed } from 'vue'
+import { ref, onMounted, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useWalletsStore } from '@/stores/wallets'
 import { useCurrenciesStore } from '@/stores/currencies'
+import { useDepositAccountsStore } from '@/stores/depositAccounts'
 import { useTransactionsStore } from '@/stores/transactions'
 import { useCurrencyConverter } from '@/composables/currencyConverter'
 
@@ -21,7 +22,7 @@ import BaseContentWrapper from '@/components/base/BaseContentWrapper.vue'
 
 // --- Stores ---
 const walletStore = useWalletsStore()
-const { wallets, localCurrency } = storeToRefs(walletStore)
+const { wallets, localCurrency, loading: walletLoading, error: walletError } = storeToRefs(walletStore)
 const { fetchWallets, createWallet, depositFunds, sendFunds, swapFunds } = walletStore
 
 const currenciesStore = useCurrenciesStore()
@@ -31,6 +32,10 @@ const { fetchCurrencies } = currenciesStore
 const transactionsStore = useTransactionsStore()
 const { transactions, loading: txLoading, error: txError } = storeToRefs(transactionsStore)
 const { fetchTransactions, addTransaction } = transactionsStore
+
+const depositAccountsStore = useDepositAccountsStore()
+const { accounts: depositAccounts } = storeToRefs(depositAccountsStore)
+const { fetchAccounts: fetchDepositAccounts } = depositAccountsStore
 
 // --- Composables ---
 const { convert } = useCurrencyConverter()
@@ -45,16 +50,17 @@ const modals = ref({
 
 const forms = ref({
   newWallet: { currency: '' },
-  deposit: { wallet: '', amount: '', source: '' },
+  deposit: { wallet: '', amount: '', account: '' },
   send: { wallet: '', amount: '', recipient: '' },
   swap: { fromWallet: '', toWallet: '', amount: '' }
 })
 
+// --- Per-field errors ---
 const errors = ref({
-  create: '',
-  deposit: '',
-  send: '',
-  swap: ''
+  create: { currency: '' },
+  deposit: { wallet: '', amount: '', account: '' },
+  send: { wallet: '', amount: '', recipient: '' },
+  swap: { fromWallet: '', toWallet: '', amount: '' }
 })
 
 const loading = ref({
@@ -71,36 +77,65 @@ const showToast = (message, type = 'success', duration = 3000) => {
   setTimeout(() => (toast.value = { message: '', type: 'success' }), duration)
 }
 
-// --- Lifecycle ---
-onMounted(async () => {
-  try {
-    await Promise.all([fetchWallets(), fetchCurrencies(), fetchTransactions()])
-  } catch (err) {
-    showToast(err.message || 'Failed to fetch data', 'error')
+// --- Options ---
+const depositAccountOptions = computed(() => {
+  if (!depositAccounts.value || depositAccounts.value.length === 0) {
+    return [
+      {
+        value: '',
+        label: 'No accounts. Add in settings.',
+        type: 'empty',
+        disabled: true
+      }
+    ]
   }
+
+  return depositAccounts.value.map(acc => {
+    if (acc.type === 'Bank Account') {
+      return {
+        value: acc.id,
+        label: `${acc.bankName} - ${acc.accountNumber} (${acc.accountName})`,
+        type: acc.type
+      }
+    }
+    if (acc.type === 'Crypto Wallet') {
+      return {
+        value: acc.id,
+        label: `${acc.walletName} (${acc.address.slice(0, 6)}...${acc.address.slice(-4)})`,
+        type: acc.type
+      }
+    }
+    return {
+      value: acc.id,
+      label: acc.type,
+      type: acc.type
+    }
+  })
 })
 
 // --- Helpers ---
 const resetForm = (key) => {
   const defaults = {
     newWallet: { currency: '' },
-    deposit: { wallet: '', amount: '', source: '' },
+    deposit: { wallet: '', amount: '', account: '' },
     send: { wallet: '', amount: '', recipient: '' },
     swap: { fromWallet: '', toWallet: '', amount: '' }
   }
+
+  const defaultErrors = {
+    create: { currency: '' },
+    deposit: { wallet: '', amount: '', account: '' },
+    send: { wallet: '', amount: '', recipient: '' },
+    swap: { fromWallet: '', toWallet: '', amount: '' }
+  }
+
   forms.value[key] = { ...defaults[key] }
-  errors.value[key] = ''
+  errors.value[key] = { ...defaultErrors[key] }
 }
 
 const walletOptions = computed(() =>
   wallets.value.map(w => ({ value: w.id, label: `${w.currency} Wallet`, ...w }))
 )
-
-const sourceOptions = [
-  { value: 'bank', label: 'Bank Transfer' },
-  { value: 'card', label: 'Credit/Debit Card' },
-  { value: 'crypto', label: 'External Wallet' }
-]
 
 const safeWallets = computed(() =>
   wallets.value?.map(w => ({
@@ -109,15 +144,11 @@ const safeWallets = computed(() =>
   })) ?? []
 )
 
-const sortedTransactions = computed(() =>
-  [...transactions.value].sort((a, b) => new Date(b.date) - new Date(a.date))
-)
-
 // --- Actions ---
 const handleCreateWallet = async () => {
-  errors.value.create = ''
+  errors.value.create.currency = ''
   if (!forms.value.newWallet.currency) {
-    errors.value.create = 'Please select a currency'
+    errors.value.create.currency = 'Please select a currency'
     return
   }
 
@@ -128,30 +159,35 @@ const handleCreateWallet = async () => {
     resetForm('newWallet')
     modals.value.createWallet = false
   } catch (err) {
-    errors.value.create = err.message || 'Failed to create wallet'
-    showToast(errors.value.create, 'error')
+    errors.value.create.currency = err.message || 'Failed to create wallet'
+    showToast(errors.value.create.currency, 'error')
   } finally {
     loading.value.create = false
   }
 }
 
 const handleDeposit = async () => {
-  const { wallet, amount, source } = forms.value.deposit
-  if (!wallet || !amount || !source) {
-    errors.value.deposit = 'Please complete all fields'
+  const { wallet, amount, account } = forms.value.deposit
+  errors.value.deposit = { wallet: '', amount: '', account: '' }
+
+  if (!wallet) errors.value.deposit.wallet = 'Select a wallet'
+  if (!amount) errors.value.deposit.amount = 'Enter an amount'
+  if (!account) errors.value.deposit.account = 'Choose a deposit account'
+
+  if (errors.value.deposit.wallet || errors.value.deposit.amount || errors.value.deposit.account) {
     return
   }
 
   loading.value.deposit = true
   try {
-    const updatedWallet = await depositFunds({ wallet, amount, source })
+    const updatedWallet = await depositFunds({ wallet, amount, account })
     await addTransaction({
       type: 'Deposit',
       currency: updatedWallet.currency,
       amount,
       date: new Date().toISOString(),
       status: 'Completed',
-      source
+      account
     })
     showToast('Deposit successful!')
     resetForm('deposit')
@@ -165,8 +201,13 @@ const handleDeposit = async () => {
 
 const handleSend = async () => {
   const { wallet, amount, recipient } = forms.value.send
-  if (!wallet || !amount || !recipient) {
-    errors.value.send = 'Please complete all fields'
+  errors.value.send = { wallet: '', amount: '', recipient: '' }
+
+  if (!wallet) errors.value.send.wallet = 'Select a wallet'
+  if (!amount) errors.value.send.amount = 'Enter an amount'
+  if (!recipient) errors.value.send.recipient = 'Enter recipient'
+
+  if (errors.value.send.wallet || errors.value.send.amount || errors.value.send.recipient) {
     return
   }
 
@@ -193,8 +234,13 @@ const handleSend = async () => {
 
 const handleSwap = async () => {
   const { fromWallet, toWallet, amount } = forms.value.swap
-  if (!fromWallet || !toWallet || !amount) {
-    errors.value.swap = 'Please complete all fields'
+  errors.value.swap = { fromWallet: '', toWallet: '', amount: '' }
+
+  if (!fromWallet) errors.value.swap.fromWallet = 'Select a source wallet'
+  if (!toWallet) errors.value.swap.toWallet = 'Select a destination wallet'
+  if (!amount) errors.value.swap.amount = 'Enter an amount'
+
+  if (errors.value.swap.fromWallet || errors.value.swap.toWallet || errors.value.swap.amount) {
     return
   }
 
@@ -225,27 +271,65 @@ const handleSwap = async () => {
     loading.value.swap = false
   }
 }
+
+
+// Clear per-field errors when a field changes
+Object.keys(forms.value).forEach((formKey) => {
+  Object.keys(forms.value[formKey]).forEach((fieldKey) => {
+    watch(
+      () => forms.value[formKey][fieldKey],
+      (newVal) => {
+        if (newVal) {
+          errors.value[formKey][fieldKey] = ''
+        }
+      }
+    )
+  })
+})
+
+
+// --- Lifecycle ---
+onMounted(async () => {
+  try {
+    await Promise.all([fetchCurrencies(), fetchDepositAccounts(), fetchWallets(), fetchTransactions()])
+  } catch (err) {
+    showToast(err.message || 'Failed to fetch data', 'error')
+  }
+})
 </script>
+
 
 <template>
   <AppLayout>
     <div class="space-y-8">
-      <!-- Balance -->
-      <BalanceCard :wallets="safeWallets" :preferred-currency="localCurrency ?? 'NGN'"
-        @create-wallet="modals.createWallet = true" />
+      <section>
+        <!-- Balance -->
+        <BalanceCard :wallets="safeWallets" :preferred-currency="localCurrency ?? 'NGN'"
+          @create-wallet="modals.createWallet = true" />
 
-      <!-- Actions -->
-      <div class="grid grid-cols-3 gap-4">
-        <ActionButton label="Deposit" icon="bi-arrow-down-circle" @click="modals.deposit = true" />
-        <ActionButton label="Send" icon="bi-send" color="bg-green-600" @click="modals.send = true" />
-        <ActionButton label="Swap" icon="bi-arrow-left-right" color="bg-yellow-600" @click="modals.swap = true" />
-      </div>
+        <!-- Actions -->
+        <div class="grid grid-cols-3 gap-4 mt-2">
+          <ActionButton label="Deposit" icon="bi-arrow-down-circle" color="bg-success" @click="modals.deposit = true" />
+          <ActionButton label="Send" icon="bi-send" color="bg-warning" @click="modals.send = true" />
+          <ActionButton label="Swap" icon="bi-arrow-left-right" color="bg-accent" @click="modals.swap = true" />
+        </div>
+      </section>
 
       <!-- Wallets -->
-      <WalletsList :wallets="wallets ?? []" />
+      <section class="w-full">
+        <h2 class="md:text-lg font-medium mb-2">Wallets</h2>
+
+        <BaseContentWrapper :items="wallets" :loading="walletLoading" :error="walletError" :empty-state="{
+          title: 'No wallets found',
+          description: 'You do not have any wallets yet. Create one to get started.'
+        }">
+          <WalletsList :wallets="wallets ?? []" :currencies="currencies" />
+        </BaseContentWrapper>
+      </section>
+
 
       <!-- Transactions -->
-      <div class="pb-8">
+      <section class="pb-8">
 
         <h2 class="md:text-lg font-medium mb-4">Recent Transactions</h2>
 
@@ -265,13 +349,14 @@ const handleSwap = async () => {
           </router-link>
         </div>
 
-      </div>
+      </section>
+
       <!-- Create Wallet Modal -->
       <BaseModal v-model="modals.createWallet" title="Create Wallet">
         <form @submit.prevent="handleCreateWallet" class="space-y-4">
           <BaseSelect v-model="forms.newWallet.currency" label="Currency" :options="currencies ?? []"
             :disabled="currenciesLoading || loading.create" :disabled-options="wallets.map(w => w.currency)"
-            :error="errors.create" />
+            :error="errors.create.currency" />
           <BaseButton type="submit" class="w-full" :loading="loading.create" loading-text="Creating...">
             Create Wallet
           </BaseButton>
@@ -282,11 +367,11 @@ const handleSwap = async () => {
       <BaseModal v-model="modals.deposit" title="Deposit Funds">
         <form @submit.prevent="handleDeposit" class="space-y-4">
           <BaseSelect v-model="forms.deposit.wallet" label="Select Wallet" :options="walletOptions"
-            :error="errors.deposit" />
+            :error="errors.deposit.wallet" />
           <BaseInput v-model="forms.deposit.amount" type="number" label="Amount" placeholder="Enter amount"
-            :disabled="loading.deposit" :error="errors.deposit" />
-          <BaseSelect v-model="forms.deposit.source" label="Funding Source" :options="sourceOptions"
-            :disabled="loading.deposit" :error="errors.deposit" />
+            :disabled="loading.deposit" :error="errors.deposit.amount" />
+          <BaseSelect v-model="forms.deposit.account" label="Deposit Account" :options="depositAccountOptions"
+            :disabled="loading.deposit" :error="errors.deposit.account" />
           <BaseButton type="submit" class="w-full" :loading="loading.deposit" loading-text="Depositing...">
             Deposit
           </BaseButton>
@@ -296,11 +381,12 @@ const handleSwap = async () => {
       <!-- Send Modal -->
       <BaseModal v-model="modals.send" title="Send Funds">
         <form @submit.prevent="handleSend" class="space-y-4">
-          <BaseSelect v-model="forms.send.wallet" label="Select Wallet" :options="walletOptions" :error="errors.send" />
+          <BaseSelect v-model="forms.send.wallet" label="Select Wallet" :options="walletOptions"
+            :error="errors.send.wallet" />
           <BaseInput v-model="forms.send.amount" type="number" label="Amount" placeholder="Enter amount"
-            :disabled="loading.send" :error="errors.send" />
-          <BaseInput v-model="forms.send.recipient" type="text" label="Recipient" placeholder="Wallet address or email"
-            :disabled="loading.send" :error="errors.send" />
+            :disabled="loading.send" :error="errors.send.amount" />
+          <BaseInput v-model="forms.send.recipient" type="text" label="Recipient" placeholder="Wallet address"
+            :disabled="loading.send" :error="errors.send.recipient" />
           <BaseButton type="submit" class="w-full" :loading="loading.send" loading-text="Sending...">
             Send
           </BaseButton>
@@ -311,10 +397,11 @@ const handleSwap = async () => {
       <BaseModal v-model="modals.swap" title="Swap Funds">
         <form @submit.prevent="handleSwap" class="space-y-4">
           <BaseSelect v-model="forms.swap.fromWallet" label="From Wallet" :options="walletOptions"
-            :error="errors.swap" />
-          <BaseSelect v-model="forms.swap.toWallet" label="To Wallet" :options="walletOptions" :error="errors.swap" />
+            :error="errors.swap.fromWallet" />
+          <BaseSelect v-model="forms.swap.toWallet" label="To Wallet" :options="walletOptions"
+            :error="errors.swap.toWallet" />
           <BaseInput v-model="forms.swap.amount" type="number" label="Amount" placeholder="Enter amount"
-            :disabled="loading.swap" :error="errors.swap" />
+            :disabled="loading.swap" :error="errors.swap.amount" />
           <BaseButton type="submit" class="w-full" :loading="loading.swap" loading-text="Swapping...">
             Swap
           </BaseButton>

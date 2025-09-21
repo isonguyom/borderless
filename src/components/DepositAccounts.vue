@@ -1,35 +1,39 @@
 <template>
   <div class="space-y-6">
-    <h2 class="text-lg font-semibold">Deposit Accounts</h2>
+    <h2 class="md:text-lg font-medium mb-4">Deposit Accounts</h2>
 
     <!-- Existing Accounts -->
-    <div v-if="accounts.length" class="space-y-3">
-      <div v-for="acc in accounts" :key="acc.id"
-        class="relative border border-gray-300 dark:border-gray-700 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 p-3 rounded-lg text-sm md:text-base">
-        <div>
-          <p class="font-medium">{{ acc.type }}</p>
-          <p class="text-sm text-gray-500">
-            <span v-if="acc.type === 'Crypto Wallet'">
-              {{ acc.walletName }} - {{ acc.address }}
-            </span>
-            <span v-else-if="acc.type === 'Bank Account'" class="flex flex-col">
-              {{ acc.bankName }} - {{ acc.accountNumber }}
-              <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ acc.accountName }}</span>
-            </span>
-            <span v-else-if="acc.type === 'Card'" class="flex flex-col">
-              {{ acc.cardType }} - ****{{ acc.last4 }}
-              <span v-if="acc.cardName" class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ acc.cardName
-                }}</span>
-            </span>
-          </p>
+    <BaseContentWrapper :items="accounts" :loading="loading" :error="false"
+      :empty-state="{ title: 'No accounts found', description: 'Add an account to get started.' }">
+
+      <div class="space-y-3">
+        <div v-for="acc in accounts" :key="acc.id"
+          class="relative border border-gray-300 dark:border-gray-700 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 p-3 rounded-lg text-sm md:text-base">
+          <div>
+            <p class="font-medium">{{ acc.type }}</p>
+            <p class="text-sm text-gray-500">
+              <span v-if="acc.type === 'Crypto Wallet'">
+                {{ acc.walletName }} - {{ acc.address }}
+              </span>
+              <span v-else-if="acc.type === 'Bank Account'" class="flex flex-col">
+                {{ acc.bankName }} - {{ acc.accountNumber }}
+                <span class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ acc.accountName }}</span>
+              </span>
+              <span v-else-if="acc.type === 'Card'" class="flex flex-col">
+                {{ acc.cardType }} - ****{{ acc.last4 }}
+                <span v-if="acc.cardName" class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ acc.cardName
+                  }}</span>
+              </span>
+            </p>
+          </div>
+          <button class="text-danger hover:text-red-600 text-2xl absolute right-3 top-3 cursor-pointer"
+            @click="$emit('remove-account', acc.id)">
+            <i class="bi bi-x"></i>
+          </button>
         </div>
-        <button class="text-danger hover:text-red-600 text-2xl absolute right-3 top-3 cursor-pointer"
-          @click="$emit('remove-account', acc.id)">
-          <i class="bi bi-x"></i>
-        </button>
       </div>
-    </div>
-    <p v-else class="text-sm text-gray-500">No deposit accounts added yet.</p>
+    </BaseContentWrapper>
+
 
     <!-- Add New Account -->
     <form @submit.prevent="submitForm" class="space-y-3" novalidate>
@@ -80,7 +84,8 @@
       </div>
 
       <div class="flex justify-end">
-        <BaseButton type="submit" :loading="loading" loading-text="Adding..." :disabled="loading" aria-busy="loading">
+        <BaseButton v-if="newAccount.type" type="submit" :loading="loading" loading-text="Adding..." :disabled="loading"
+          aria-busy="loading">
           Add Account
         </BaseButton>
       </div>
@@ -93,9 +98,10 @@ import { ref, reactive, watch } from "vue"
 import BaseInput from "./base/BaseInput.vue"
 import BaseSelect from "./base/BaseSelect.vue"
 import BaseButton from "./base/BaseButton.vue"
+import BaseContentWrapper from "./base/BaseContentWrapper.vue"
 
 defineProps({
-  accounts: { type: Array, required: true }
+  accounts: { type: Array, required: true },
 })
 const emits = defineEmits(["add-account", "remove-account"])
 
@@ -131,16 +137,26 @@ const numbersOnly = (field) => {
 }
 
 
-
-const pasteWalletAddress = () => {
+const pasteWalletAddress = async () => {
   pastingAddress.value = true
+  try {
+    // Optional delay
+    await new Promise(resolve => setTimeout(resolve, 1000))
 
-  // Simulate a short delay like reading from clipboard
-  setTimeout(() => {
-    newAccount.value.address = "0x1234567890ABCDEF" // Simulated wallet address
-    validateCryptoAddress() // Call your crypto wallet validation
+    // Read text from clipboard
+    const text = await navigator.clipboard.readText()
+    if (text) {
+      newAccount.value.address = text.trim()
+      validateCryptoAddress()
+    } else {
+      errors.address = "Clipboard is empty."
+    }
+  } catch (err) {
+    console.error("Failed to read clipboard:", err)
+    errors.address = "Cannot access clipboard. Please paste manually."
+  } finally {
     pastingAddress.value = false
-  }, 1000)
+  }
 }
 
 
