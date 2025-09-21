@@ -1,3 +1,4 @@
+// src/stores/auth.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/utils/api'
@@ -8,6 +9,7 @@ export const useAuthStore = defineStore('auth', () => {
   const user = ref(null)
   const token = ref(null)
   const localCurrency = ref('NGN')
+
   const isAuthenticated = computed(() => !!user.value && !!token.value)
 
   function generateRandomUsername() {
@@ -15,15 +17,13 @@ export const useAuthStore = defineStore('auth', () => {
     const nouns = ['Lion', 'Falcon', 'Tiger', 'Panther', 'Eagle', 'Shark', 'Wolf']
     const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)]
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)]
-    const randomNumber = Math.floor(100 + Math.random() * 900) // 3-digit number
+    const randomNumber = Math.floor(100 + Math.random() * 900)
     return `${randomAdjective}${randomNoun}${randomNumber}`
   }
 
-
   // 🔑 Sign up
   async function signup(emailOrPhone) {
-    // check if user exists first
-    const existing = await api.get(`/users?emailOrPhone=${emailOrPhone}`)
+    const existing = await api.get('/users', { params: { emailOrPhone } })
     if (existing.data.length > 0) {
       const err = new Error('User already exists')
       err.code = 'USER_EXISTS'
@@ -31,13 +31,17 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const payload = {
-      emailOrPhone, currency: localCurrency.value, username: generateRandomUsername(), notifications: {
+      emailOrPhone,
+      currency: localCurrency.value,
+      username: generateRandomUsername(),
+      notifications: {
         email: true,
         push: false,
         inApp: true
-
-      }, createdAt: new Date().toISOString()
+      },
+      createdAt: new Date().toISOString()
     }
+
     const res = await api.post('/users', payload)
     user.value = res.data
     await issueToken(res.data.id)
@@ -46,7 +50,7 @@ export const useAuthStore = defineStore('auth', () => {
 
   // 🔑 Login
   async function login(emailOrPhone) {
-    const res = await api.get(`/users?emailOrPhone=${emailOrPhone}`)
+    const res = await api.get('/users', { params: { emailOrPhone } })
     if (res.data.length === 0) {
       const err = new Error('User not found')
       err.code = 'USER_NOT_FOUND'
@@ -89,28 +93,45 @@ export const useAuthStore = defineStore('auth', () => {
     router.push('/onboard')
   }
 
+  // 👤 Fetch user with query-string style
   async function fetchUser() {
     if (!user.value) return null
 
-    const res = await api.get(`/users`, { params: { id: user.value.id } })
+    const res = await api.get('/users', { params: { id: user.value.id } })
+
+    if (!res.data || res.data.length === 0) {
+      throw new Error('User not found')
+    }
+
+    user.value = res.data[0]
+    saveSession()
+    return user.value
+  }
+
+  // ✏️ Update profile with query-string style
+  async function updateProfile(payload) {
+    if (!user.value) throw new Error('No user is logged in')
+
+    const res = await api.patch('/users', {
+      ...user.value,
+      ...payload,
+      id: user.value.id
+    })
 
     user.value = res.data
     saveSession()
     return res.data
   }
 
-  async function updateProfile(payload) {
-    if (!user.value) throw new Error('No user is logged in')
-
-    const res = await api.put(`/users/${user.value.id}`, {
-      ...user.value,
-      ...payload
-    })
-
-    user.value = res.data
-    saveSession() // persist updated user
-    return res.data
+  return {
+    user,
+    token,
+    isAuthenticated,
+    signup,
+    login,
+    loadSession,
+    logout,
+    fetchUser,
+    updateProfile
   }
-
-  return { user, token, isAuthenticated, signup, login, loadSession, logout, fetchUser, updateProfile }
 })
