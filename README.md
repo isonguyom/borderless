@@ -50,7 +50,7 @@ This project prioritizes **frontend-first development**, with a focus on UX, sta
 **Clone the repository**
 
 ```bash
-[git clone https://github.com/yourusername/operation-borderless.git](https://github.com/isonguyom/borderless.git)
+git clone https://github.com/isonguyom/borderless.git
 cd borderless
 ```
 
