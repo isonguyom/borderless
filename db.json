@@ -103,7 +103,7 @@
     {
       "id": "ee6f",
       "currency": "USD",
-      "balance": 10,
+      "balance": 30,
       "createdAt": "2025-09-21T14:11:13.275Z"
     },
     {
@@ -123,6 +123,18 @@
       "currency": "USDT",
       "balance": 0,
       "createdAt": "2025-09-21T14:34:47.433Z"
+    },
+    {
+      "id": "4904",
+      "currency": "GBP",
+      "balance": 0,
+      "createdAt": "2025-09-21T15:19:07.342Z"
+    },
+    {
+      "id": "dff7",
+      "currency": "USDC",
+      "balance": 0,
+      "createdAt": "2025-09-21T15:19:21.285Z"
     }
   ],
   "transactions": [
@@ -152,6 +164,15 @@
       "convertedAmount": 15000,
       "date": "2025-09-21T14:39:06.890Z",
       "status": "Completed"
+    },
+    {
+      "id": "e185",
+      "type": "Deposit",
+      "currency": "USD",
+      "amount": "20",
+      "date": "2025-09-21T15:25:03.861Z",
+      "status": "Completed",
+      "account": "1758465501354"
     }
   ],
   "depositAccounts": [
