@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onMounted, watchEffect } from 'vue'
+import { ref, onMounted, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useWalletsStore } from '@/stores/wallets'
 import { useCurrenciesStore } from '@/stores/currencies'
@@ -87,25 +87,28 @@ const handleRemoveAccount = async (id) => {
 }
 
 
-// Populate profileForm whenever `user` in the store changes
-watchEffect(() => {
-  if (user.value) {
-    profileForm.value = {
-      ...profileForm.value,
-      currency: user.value.currency ?? profileForm.value.currency,
-      username: user.value.username ?? profileForm.value.username,
-      emailOrPhone: user.value.emailOrPhone ?? profileForm.value.emailOrPhone,
-      notifications: user.value.notifications ?? profileForm.value.notifications,
-    }
-  }
-})
-
-// --- Lifecycle ---
 onMounted(async () => {
   await fetchCurrencies()
   await fetchAccounts()
-
+  // Make sure user is loaded
+  if (!user.value) {
+    await fetchUser() // fetch and populate store
+  }
 })
+
+// Populate form when store has user
+watch(user, (newUser) => {
+  if (newUser) {
+    profileForm.value = {
+      ...profileForm.value,
+      currency: newUser.currency ?? profileForm.value.currency,
+      username: newUser.username ?? profileForm.value.username,
+      emailOrPhone: newUser.emailOrPhone ?? profileForm.value.emailOrPhone,
+      notifications: newUser.notifications ?? profileForm.value.notifications,
+    }
+  }
+}, { immediate: true }) // runs immediately if user already exists
+
 </script>
 
 <template>
