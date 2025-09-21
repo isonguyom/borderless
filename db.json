@@ -205,13 +205,5 @@
       "status": "Completed"
     }
   ],
-  "depositAccounts": [
-    {
-      "id": "1758465501354",
-      "type": "Bank Account",
-      "bankName": "First Bank",
-      "accountName": "Account 7890",
-      "accountNumber": "1234567890"
-    }
-  ]
+  "depositAccounts": []
 }
