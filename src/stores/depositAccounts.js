@@ -38,7 +38,6 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
   // Remove account
   const removeAccount = async (id) => {
     try {
-      console.log(id)
       await api.delete(`/depositAccounts/${id}`)
       accounts.value = accounts.value.filter(acc => acc.id !== id)
     } catch (err) {
