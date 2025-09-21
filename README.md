@@ -80,6 +80,9 @@ npm run dev
 npx json-server --watch db.json --port 4000
 ```
 
+App runs on: `http://localhost:5173`
+Mock API runs on: `http://localhost:4000` (via JSON-server)
+
 ### Compile and Minify for Production
 
 ```sh
