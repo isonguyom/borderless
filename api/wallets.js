@@ -1,30 +1,38 @@
-// In-memory "database"
-let wallets = []
+// api/wallets.js
+import { readFileSync, writeFileSync } from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const dbFile = path.join(__dirname, "db.json");
+
+function readDB() {
+  return JSON.parse(readFileSync(dbFile, "utf-8"));
+}
+
+function writeDB(data) {
+  writeFileSync(dbFile, JSON.stringify(data, null, 2));
+}
 
 export default function handler(req, res) {
-  if (req.method === 'POST') {
-    const { currency, balance = 0 } = req.body
+  const db = readDB();
+  const { wallets } = db;
 
-    // Check if wallet for this currency already exists
-    const exists = wallets.find(w => w.currency === currency)
-    if (exists) {
-      return res.status(409).json({ code: 'WALLET_EXISTS', message: 'Wallet already exists' })
-    }
-
-    const newWallet = {
-      id: Date.now(),
-      currency,
-      balance,
-      createdAt: new Date().toISOString()
-    }
-
-    wallets.push(newWallet)
-    return res.status(201).json(newWallet)
+  if (req.method === "GET") {
+    res.status(200).json(wallets);
   }
 
-  if (req.method === 'GET') {
-    return res.status(200).json(wallets)
+  if (req.method === "POST") {
+    const newWallet = { id: Date.now().toString(), ...req.body };
+    wallets.push(newWallet);
+    writeDB(db);
+    res.status(201).json(newWallet);
   }
 
-  return res.status(405).json({ message: 'Method not allowed' })
+  if (req.method === "DELETE") {
+    const { id } = req.query;
+    db.wallets = wallets.filter(w => w.id !== id);
+    writeDB(db);
+    res.status(200).json({ success: true });
+  }
 }

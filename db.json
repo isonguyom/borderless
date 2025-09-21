@@ -75,81 +75,45 @@
   ],
   "users": [
     {
-      "id": "d198",
+      "id": "9916",
       "emailOrPhone": "isonguyom@gmail.com",
-      "currency": "GBP",
-      "username": "SilentLion480",
+      "currency": "NGN",
+      "username": "SwiftPanther159",
       "notifications": {
         "email": true,
         "push": false,
         "inApp": true
       },
-      "createdAt": "2025-09-21T13:23:45.384Z"
+      "createdAt": "2025-09-21T14:11:26.684Z"
     }
   ],
   "tokens": [
     {
-      "id": "8d43",
-      "userId": "d198",
-      "token": "mock_1758461025420_70eq7qriwm"
+      "id": "b08a",
+      "userId": "9916",
+      "token": "mock_1758463886710_itvywhk04rp"
     }
   ],
   "wallets": [
     {
-      "id": "f4c1",
+      "id": "ee6f",
       "currency": "USD",
-      "balance": 9,
-      "createdAt": "2025-09-21T13:42:05.910Z"
-    },
-    {
-      "id": "678a",
-      "currency": "NGN",
-      "balance": 1500,
-      "createdAt": "2025-09-21T13:42:05.910Z"
-    },
-    {
-      "id": "8230",
-      "currency": "GBP",
       "balance": 0,
-      "createdAt": "2025-09-21T13:42:12.811Z"
-    }
-  ],
-  "transactions": [
-    {
-      "id": "c30f",
-      "type": "Deposit",
-      "currency": "USD",
-      "amount": "20",
-      "date": "2025-09-21T13:42:46.839Z",
-      "status": "Completed",
-      "account": "1758461146790"
+      "createdAt": "2025-09-21T14:11:13.275Z"
     },
     {
-      "id": "3591",
-      "type": "Send",
-      "currency": "USD",
-      "amount": "10",
-      "date": "2025-09-21T13:43:12.777Z",
-      "status": "Completed",
-      "recipient": "yuhlgj;khln;m.'k/l\\"
+      "id": "a66f",
+      "currency": "NGN",
+      "balance": 0,
+      "createdAt": "2025-09-21T14:11:13.275Z"
     },
     {
-      "id": "95a7",
-      "type": "Swap",
-      "currency": "USD → NGN",
-      "amount": "1",
-      "convertedAmount": 1500,
-      "date": "2025-09-21T13:43:46.266Z",
-      "status": "Completed"
+      "id": "fe81",
+      "currency": "EUR",
+      "balance": 0,
+      "createdAt": "2025-09-21T14:11:39.393Z"
     }
   ],
-  "depositAccounts": [
-    {
-      "id": "1758461146790",
-      "type": "Bank Account",
-      "bankName": "First Bank",
-      "accountName": "Account 7890",
-      "accountNumber": "1234567890"
-    }
-  ]
+  "transactions": [],
+  "depositAccounts": []
 }
