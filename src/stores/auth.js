@@ -1,4 +1,3 @@
-// stores/auth.js
 import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
 import api from '@/utils/api'
@@ -11,40 +10,19 @@ export const useAuthStore = defineStore('auth', () => {
   const localCurrency = ref('NGN')
   const isAuthenticated = computed(() => !!user.value && !!token.value)
 
-  // Detect environment
-  const isLocal = import.meta.env.VITE_API_BASE_URL?.includes('localhost')
-
-  // --- PATCH/PUT helper
-  const patchUser = async (userId, data) => {
-    if (isLocal) {
-      // JSON-server: full replace (PUT)
-      return api.put(`/users/${userId}`, data)
-    } else {
-      // Production: partial update (PATCH)
-      return api.patch(`/users?id=${userId}`, data)
-    }
-  }
-
-  // --- GET user helper
-  // const getUser = async (userId) => {
-  //   if (isLocal) {
-  //     return api.get(`/users/${userId}`)
-  //   } else {
-  //     return api.get(`/users?id=${userId}`)
-  //   }
-  // }
-
   function generateRandomUsername() {
     const adjectives = ['Swift', 'Brave', 'Clever', 'Mighty', 'Silent', 'Golden', 'Quick']
     const nouns = ['Lion', 'Falcon', 'Tiger', 'Panther', 'Eagle', 'Shark', 'Wolf']
     const randomAdjective = adjectives[Math.floor(Math.random() * adjectives.length)]
     const randomNoun = nouns[Math.floor(Math.random() * nouns.length)]
-    const randomNumber = Math.floor(100 + Math.random() * 900)
+    const randomNumber = Math.floor(100 + Math.random() * 900) // 3-digit number
     return `${randomAdjective}${randomNoun}${randomNumber}`
   }
 
+
   // 🔑 Sign up
   async function signup(emailOrPhone) {
+    // check if user exists first
     const existing = await api.get(`/users?emailOrPhone=${emailOrPhone}`)
     if (existing.data.length > 0) {
       const err = new Error('User already exists')
@@ -53,11 +31,12 @@ export const useAuthStore = defineStore('auth', () => {
     }
 
     const payload = {
-      emailOrPhone,
-      currency: localCurrency.value,
-      username: generateRandomUsername(),
-      notifications: { email: true, push: false, inApp: true },
-      createdAt: new Date().toISOString(),
+      emailOrPhone, currency: localCurrency.value, username: generateRandomUsername(), notifications: {
+        email: true,
+        push: false,
+        inApp: true
+
+      }, createdAt: new Date().toISOString()
     }
     const res = await api.post('/users', payload)
     user.value = res.data
@@ -73,12 +52,13 @@ export const useAuthStore = defineStore('auth', () => {
       err.code = 'USER_NOT_FOUND'
       throw err
     }
+
     user.value = res.data[0]
     await issueToken(user.value.id)
     saveSession()
   }
 
-  // 🎫 Fake token
+  // 🎫 Issue fake token
   async function issueToken(userId) {
     const mockToken = `mock_${Date.now()}_${Math.random().toString(36).substring(2)}`
     const tokenRes = await api.post('/tokens', { userId, token: mockToken })
@@ -109,37 +89,27 @@ export const useAuthStore = defineStore('auth', () => {
     router.push('/onboard')
   }
 
- async function fetchUser() {
+  async function fetchUser() {
     if (!user.value) return null
+
     const res = await api.get(`/users/${user.value.id}`)
     user.value = res.data
     saveSession()
     return res.data
   }
 
-  // ✏️ Update profile
   async function updateProfile(payload) {
     if (!user.value) throw new Error('No user is logged in')
 
-    // Local requires full object, prod just needs partial
-    const body = isLocal ? { ...user.value, ...payload } : payload
-    const res = await patchUser(user.value.id, body)
+    const res = await api.put(`/users/${user.value.id}`, {
+      ...user.value,
+      ...payload
+    })
 
-    // In prod, res.data might be an array
-    user.value = Array.isArray(res.data) ? res.data[0] : res.data
-    saveSession()
-    return user.value
+    user.value = res.data
+    saveSession() // persist updated user
+    return res.data
   }
 
-  return {
-    user,
-    token,
-    isAuthenticated,
-    signup,
-    login,
-    loadSession,
-    logout,
-    fetchUser,
-    updateProfile,
-  }
+  return { user, token, isAuthenticated, signup, login, loadSession, logout, fetchUser, updateProfile }
 })
