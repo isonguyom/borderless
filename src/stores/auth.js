@@ -26,13 +26,13 @@ export const useAuthStore = defineStore('auth', () => {
   }
 
   // --- GET user helper
-  const getUser = async (userId) => {
-    if (isLocal) {
-      return api.get(`/users/${userId}`)
-    } else {
-      return api.get(`/users?id=${userId}`)
-    }
-  }
+  // const getUser = async (userId) => {
+  //   if (isLocal) {
+  //     return api.get(`/users/${userId}`)
+  //   } else {
+  //     return api.get(`/users?id=${userId}`)
+  //   }
+  // }
 
   function generateRandomUsername() {
     const adjectives = ['Swift', 'Brave', 'Clever', 'Mighty', 'Silent', 'Golden', 'Quick']
@@ -109,14 +109,12 @@ export const useAuthStore = defineStore('auth', () => {
     router.push('/onboard')
   }
 
-  // 🔄 Refresh user
-  async function fetchUser() {
+ async function fetchUser() {
     if (!user.value) return null
-    const res = await getUser(user.value.id)
-    // In prod, res.data might be an array (because of ?id=)
-    user.value = Array.isArray(res.data) ? res.data[0] : res.data
+    const res = await api.get(`/users/${user.value.id}`)
+    user.value = res.data
     saveSession()
-    return user.value
+    return res.data
   }
 
   // ✏️ Update profile
