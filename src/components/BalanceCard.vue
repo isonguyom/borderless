@@ -10,7 +10,7 @@ const props = defineProps({
   },
   preferredCurrency: {
     type: String,
-    default: 'USD'
+    default: 'NGN'
   }
 })
 

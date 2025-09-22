@@ -8,7 +8,30 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
   const loading = ref(false)
   const error = ref('')
 
-  // Fetch accounts from API
+  // Detect environment
+  const isLocal = import.meta.env.VITE_API_BASE_URL?.includes('localhost')
+
+  // --- PATCH/PUT helper
+  const patchAccount = async (id, data) => {
+    if (isLocal) {
+      // JSON-server expects full object on PUT
+      return api.put(`/depositAccounts/${id}`, data)
+    } else {
+      // Production API prefers partial updates
+      return api.patch(`/depositAccounts?id=${id}`, data)
+    }
+  }
+
+  // --- DELETE helper
+  const delAccount = async (id) => {
+    if (isLocal) {
+      return api.delete(`/depositAccounts/${id}`)
+    } else {
+      return api.delete(`/depositAccounts?id=${id}`)
+    }
+  }
+
+  // --- Fetch accounts
   const fetchAccounts = async () => {
     loading.value = true
     error.value = ''
@@ -22,7 +45,7 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
     }
   }
 
-  // Add new account
+  // --- Add new account
   const addAccount = async (account) => {
     try {
       const res = await api.post('/depositAccounts', account)
@@ -34,11 +57,29 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
     }
   }
 
+  // --- Update existing account
+  const updateAccount = async (id, updates) => {
+    try {
+      const existing = accounts.value.find(acc => acc.id === id)
+      if (!existing) throw new Error(`Account not found: ${id}`)
 
-  // Remove account
+      // Merge existing with updates (local requires full object)
+      const payload = isLocal ? { ...existing, ...updates } : updates
+
+      const res = await patchAccount(id, payload)
+      const idx = accounts.value.findIndex(acc => acc.id === id)
+      if (idx !== -1) accounts.value[idx] = res.data
+      return res.data
+    } catch (err) {
+      error.value = err.message || 'Failed to update account'
+      throw err
+    }
+  }
+
+  // --- Remove account
   const removeAccount = async (id) => {
     try {
-      await api.delete(`/depositAccounts/${id}`)
+      await delAccount(id)
       accounts.value = accounts.value.filter(acc => acc.id !== id)
     } catch (err) {
       error.value = err.message || 'Failed to remove account'
@@ -46,14 +87,13 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
     }
   }
 
-
-
   return {
     accounts,
     loading,
     error,
     fetchAccounts,
     addAccount,
+    updateAccount,
     removeAccount,
   }
 })

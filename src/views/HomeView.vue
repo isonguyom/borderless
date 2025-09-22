@@ -1,6 +1,7 @@
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue'
 import { storeToRefs } from 'pinia'
+import { useAuthStore } from '@/stores/auth'
 import { useWalletsStore } from '@/stores/wallets'
 import { useCurrenciesStore } from '@/stores/currencies'
 import { useDepositAccountsStore } from '@/stores/depositAccounts'
@@ -21,8 +22,12 @@ import BaseInput from '@/components/base/BaseInput.vue'
 import BaseContentWrapper from '@/components/base/BaseContentWrapper.vue'
 
 // --- Stores ---
+const authStore = useAuthStore()
+const { fetchUser } = authStore
+const { user } = storeToRefs(authStore)
+
 const walletStore = useWalletsStore()
-const { wallets, localCurrency, loading: walletLoading, error: walletError } = storeToRefs(walletStore)
+const { wallets, loading: walletLoading, error: walletError } = storeToRefs(walletStore)
 const { fetchWallets, createWallet, depositFunds, sendFunds, swapFunds } = walletStore
 
 const currenciesStore = useCurrenciesStore()
@@ -300,27 +305,29 @@ Object.keys(forms.value).forEach((formKey) => {
 // --- Lifecycle ---
 onMounted(async () => {
   try {
-    await Promise.all([fetchCurrencies(), fetchDepositAccounts(), fetchWallets(), fetchTransactions()])
+    await Promise.all([fetchCurrencies(), fetchUser(), fetchDepositAccounts(), fetchWallets(), fetchTransactions()])
   } catch (err) {
     showToast(err.message || 'Failed to fetch data', 'error')
   }
 })
 </script>
 
-
 <template>
   <AppLayout>
     <div class="space-y-8">
       <section>
         <!-- Balance -->
-        <BalanceCard :wallets="safeWallets" :preferred-currency="localCurrency ?? 'NGN'"
-          @create-wallet="modals.createWallet = true" />
+        <BalanceCard :wallets="safeWallets" :preferred-currency="user?.currency ?? 'NGN'"
+          @create-wallet="modals.createWallet = true" data-cy="balance-card" />
 
         <!-- Actions -->
         <div class="grid grid-cols-3 gap-4 mt-2">
-          <ActionButton label="Deposit" icon="bi-arrow-down-circle" color="bg-success" @click="modals.deposit = true" />
-          <ActionButton label="Send" icon="bi-send" color="bg-warning" @click="modals.send = true" />
-          <ActionButton label="Swap" icon="bi-arrow-left-right" color="bg-accent" @click="modals.swap = true" />
+          <ActionButton label="Deposit" icon="bi-arrow-down-circle" color="bg-success" @click="modals.deposit = true"
+            data-cy="deposit-button" />
+          <ActionButton label="Send" icon="bi-send" color="bg-warning" @click="modals.send = true"
+            data-cy="send-button" />
+          <ActionButton label="Swap" icon="bi-arrow-left-right" color="bg-accent" @click="modals.swap = true"
+            data-cy="swap-button" />
         </div>
       </section>
 
@@ -331,94 +338,96 @@ onMounted(async () => {
         <BaseContentWrapper :items="wallets" :loading="walletLoading" :error="walletError" :empty-state="{
           title: 'No wallets found',
           description: 'You do not have any wallets yet. Create one to get started.'
-        }">
-          <WalletsList :wallets="wallets ?? []" :currencies="currencies" />
+        }" data-cy="wallets-wrapper">
+          <WalletsList :wallets="wallets ?? []" :currencies="currencies" data-cy="wallets-list" />
         </BaseContentWrapper>
       </section>
 
-
       <!-- Transactions -->
       <section class="pb-8">
-
         <h2 class="md:text-lg font-medium mb-4">Recent Transactions</h2>
 
         <BaseContentWrapper :items="transactions.slice(0, 7)" :loading="txLoading" :error="txError" :empty-state="{
           title: 'No transactions found',
           description: 'You do not have any transactions at the moment. Check back soon.'
-        }">
+        }" data-cy="transactions-wrapper">
           <div class="space-y-2">
-            <TransactionCard v-for="tx in transactions.slice(0, 7)" :key="tx.id" :tx="tx" />
+            <TransactionCard v-for="tx in transactions.slice(0, 7)" :key="tx.id" :tx="tx" data-cy="transaction-card" />
           </div>
         </BaseContentWrapper>
 
         <div class="flex justify-end mt-3">
           <router-link v-if="transactions.length > 7" to="/history"
-            class="text-primary hover:underline text-sm font-medium">
+            class="text-primary hover:underline text-sm font-medium" data-cy="see-more-transactions">
             See more
           </router-link>
         </div>
-
       </section>
 
       <!-- Create Wallet Modal -->
-      <BaseModal v-model="modals.createWallet" title="Create Wallet">
+      <BaseModal v-model="modals.createWallet" title="Create Wallet" data-cy="create-wallet-modal">
         <form @submit.prevent="handleCreateWallet" class="space-y-4">
           <BaseSelect v-model="forms.newWallet.currency" label="Currency" :options="currencies ?? []"
             :disabled="currenciesLoading || loading.create" :disabled-options="wallets.map(w => w.currency)"
-            :error="errors.create.currency" />
-          <BaseButton type="submit" class="w-full" :loading="loading.create" loading-text="Creating...">
+            :error="errors.create.currency" data-cy="new-wallet-currency-select" />
+          <BaseButton type="submit" class="w-full" :loading="loading.create" loading-text="Creating..."
+            data-cy="create-wallet-button">
             Create Wallet
           </BaseButton>
         </form>
       </BaseModal>
 
       <!-- Deposit Modal -->
-      <BaseModal v-model="modals.deposit" title="Deposit Funds">
+      <BaseModal v-model="modals.deposit" title="Deposit Funds" data-cy="deposit-modal">
         <form @submit.prevent="handleDeposit" class="space-y-4">
           <BaseSelect v-model="forms.deposit.wallet" label="Select Wallet" :options="walletOptions"
-            :error="errors.deposit.wallet" />
+            :error="errors.deposit.wallet" data-cy="deposit-wallet-select" />
           <BaseInput v-model="forms.deposit.amount" type="number" label="Amount" placeholder="Enter amount"
-            :disabled="loading.deposit" :error="errors.deposit.amount" />
+            :disabled="loading.deposit" :error="errors.deposit.amount" data-cy="deposit-amount-input" />
           <BaseSelect v-model="forms.deposit.account" label="Deposit Account" :options="depositAccountOptions"
-            :disabled="loading.deposit" :error="errors.deposit.account" />
-          <BaseButton type="submit" class="w-full" :loading="loading.deposit" loading-text="Depositing...">
+            :disabled="loading.deposit" :error="errors.deposit.account" data-cy="deposit-account-select" />
+          <BaseButton type="submit" class="w-full" :loading="loading.deposit" loading-text="Depositing..."
+            data-cy="confirm-deposit-button">
             Deposit
           </BaseButton>
         </form>
       </BaseModal>
 
       <!-- Send Modal -->
-      <BaseModal v-model="modals.send" title="Send Funds">
+      <BaseModal v-model="modals.send" title="Send Funds" data-cy="send-modal">
         <form @submit.prevent="handleSend" class="space-y-4">
           <BaseSelect v-model="forms.send.wallet" label="Select Wallet" :options="walletOptions"
-            :error="errors.send.wallet" />
+            :error="errors.send.wallet" data-cy="send-wallet-select" />
           <BaseInput v-model="forms.send.amount" type="number" label="Amount" placeholder="Enter amount"
-            :disabled="loading.send" :error="errors.send.amount" />
+            :disabled="loading.send" :error="errors.send.amount" data-cy="send-amount-input" />
           <BaseInput v-model="forms.send.recipient" type="text" label="Recipient" placeholder="Wallet address"
-            :disabled="loading.send" :error="errors.send.recipient" />
-          <BaseButton type="submit" class="w-full" :loading="loading.send" loading-text="Sending...">
+            :disabled="loading.send" :error="errors.send.recipient" data-cy="send-recipient-input" />
+          <BaseButton type="submit" class="w-full" :loading="loading.send" loading-text="Sending..."
+            data-cy="confirm-send-button">
             Send
           </BaseButton>
         </form>
       </BaseModal>
 
       <!-- Swap Modal -->
-      <BaseModal v-model="modals.swap" title="Swap Funds">
+      <BaseModal v-model="modals.swap" title="Swap Funds" data-cy="swap-modal">
         <form @submit.prevent="handleSwap" class="space-y-4">
           <BaseSelect v-model="forms.swap.fromWallet" label="From Wallet" :options="walletOptions"
-            :error="errors.swap.fromWallet" />
+            :error="errors.swap.fromWallet" data-cy="swap-from-wallet-select" />
           <BaseSelect v-model="forms.swap.toWallet" label="To Wallet" :options="walletOptions"
-            :error="errors.swap.toWallet" />
+            :error="errors.swap.toWallet" data-cy="swap-to-wallet-select" />
           <BaseInput v-model="forms.swap.amount" type="number" label="Amount" placeholder="Enter amount"
-            :disabled="loading.swap" :error="errors.swap.amount" />
-          <BaseButton type="submit" class="w-full" :loading="loading.swap" loading-text="Swapping...">
+            :disabled="loading.swap" :error="errors.swap.amount" data-cy="swap-amount-input" />
+          <BaseButton type="submit" class="w-full" :loading="loading.swap" loading-text="Swapping..."
+            data-cy="confirm-swap-button">
             Swap
           </BaseButton>
         </form>
       </BaseModal>
 
       <!-- Toast -->
-      <BaseToast v-if="toast.message" :message="toast.message" :type="toast.type" :duration="toast.duration" />
+      <BaseToast v-if="toast.message" :message="toast.message" :type="toast.type" :duration="toast.duration"
+        data-cy="toast" />
     </div>
   </AppLayout>
 </template>

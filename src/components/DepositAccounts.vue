@@ -1,17 +1,18 @@
 <template>
-  <div class="space-y-6">
-    <h2 class="md:text-lg font-medium mb-4">Deposit Accounts</h2>
+  <div class="space-y-6" data-cy="deposit-accounts-component">
+    <h2 class="md:text-lg font-medium mb-4" data-cy="deposit-accounts-heading">Deposit Accounts</h2>
 
     <!-- Existing Accounts -->
     <BaseContentWrapper :items="accounts" :loading="loading" :error="false"
-      :empty-state="{ title: 'No accounts found', description: 'Add an account to get started.' }">
-
+      :empty-state="{ title: 'No accounts found', description: 'Add an account to get started.' }"
+      data-cy="deposit-accounts-wrapper">
       <div class="space-y-3">
         <div v-for="acc in accounts" :key="acc.id"
-          class="relative border border-gray-300 dark:border-gray-700 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 p-3 rounded-lg text-sm md:text-base">
+          class="relative border border-gray-300 dark:border-gray-700 hover:bg-gray-200/50 dark:hover:bg-gray-700/50 p-3 rounded-lg text-sm md:text-base"
+          :data-cy="'deposit-account-' + acc.id">
           <div>
-            <p class="font-medium">{{ acc.type }}</p>
-            <p class="text-sm text-gray-500">
+            <p class="font-medium" data-cy="account-type">{{ acc.type }}</p>
+            <p class="text-sm text-gray-500" data-cy="account-details">
               <span v-if="acc.type === 'Crypto Wallet'">
                 {{ acc.walletName }} - {{ acc.address }}
               </span>
@@ -22,76 +23,76 @@
               <span v-else-if="acc.type === 'Card'" class="flex flex-col">
                 {{ acc.cardType }} - ****{{ acc.last4 }}
                 <span v-if="acc.cardName" class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ acc.cardName
-                  }}</span>
+                }}</span>
               </span>
             </p>
           </div>
           <button class="text-danger hover:text-red-600 text-2xl absolute right-3 top-3 cursor-pointer"
-            @click="$emit('remove-account', acc.id)">
+            @click="$emit('remove-account', acc.id)" :data-cy="'remove-account-' + acc.id">
             <i class="bi bi-x"></i>
           </button>
         </div>
       </div>
     </BaseContentWrapper>
 
-
     <!-- Add New Account -->
-    <form @submit.prevent="submitForm" class="space-y-3" novalidate>
+    <form @submit.prevent="submitForm" class="space-y-3" novalidate data-cy="add-account-form">
       <!-- Type selector -->
       <BaseSelect v-model="newAccount.type" :options="typeOptions" label="Select Deposit Type" :error="errors.type"
-        @blur="validateField('type', 'Please select an account type.')" required />
+        @blur="validateField('type', 'Please select an account type.')" required data-cy="deposit-type-select" />
 
       <!-- Crypto Wallet -->
       <div v-if="newAccount.type === 'Crypto Wallet'" class="space-y-2 relative">
         <BaseSelect v-model="newAccount.walletName" :options="cryptoOptions" label="Coin" :error="errors.walletName"
-          @blur="validateField('walletName', 'Please select a wallet provider.')" required />
+          @blur="validateField('walletName', 'Please select a wallet provider.')" required
+          data-cy="crypto-wallet-select" />
 
         <div class="relative">
           <BaseInput v-model="newAccount.address" type="text" label="Wallet Address" placeholder="Enter wallet address"
-            :error="errors.address" @blur="validateCryptoAddress()" required />
+            :error="errors.address" @blur="validateCryptoAddress()" required data-cy="crypto-address-input" />
           <BaseButton @click="pasteWalletAddress" size="sm" :loading="pastingAddress" loading-text="Pasting..."
-            :disabled="pastingAddress" aria-busy="loading" class="absolute right-2 top-7.5">
+            :disabled="pastingAddress" class="absolute right-2 top-7.5" data-cy="paste-wallet-button">
             Paste
           </BaseButton>
         </div>
       </div>
 
-
       <!-- Bank Account -->
       <div v-else-if="newAccount.type === 'Bank Account'" class="space-y-2">
         <BaseSelect v-model="newAccount.bankName" :options="bankOptions" label="Bank" :error="errors.bankName"
-          @blur="validateField('bankName', 'Please select a bank.')" required />
+          @blur="validateField('bankName', 'Please select a bank.')" required data-cy="bank-select" />
         <BaseInput v-model="newAccount.accountNumber" type="text" label="Account Number"
           placeholder="Enter account number" maxlength="10" :error="errors.accountNumber"
           @input="numbersOnly('accountNumber')" @blur="validateField('accountNumber', 'Enter a valid account number.')"
-          required />
+          required data-cy="account-number-input" />
         <BaseInput v-model="newAccount.accountName" type="text" label="Account Name"
-          placeholder="Account name will be auto-filled" disabled />
+          placeholder="Account name will be auto-filled" disabled data-cy="account-name-input" />
       </div>
-
 
       <!-- Card -->
       <div v-else-if="newAccount.type === 'Card'" class="space-y-2">
         <BaseInput v-model="newAccount.cardNumber" type="text" label="Card Number" placeholder="Enter card number"
           maxlength="16" :error="errors.cardNumber" @input="handleCardInput"
-          @blur="validateField('cardNumber', 'Enter a valid card number.')" required />
+          @blur="validateField('cardNumber', 'Enter a valid card number.')" required data-cy="card-number-input" />
         <BaseInput v-model="newAccount.cardType" type="text" label="Card Type" placeholder="Detected from card number"
-          disabled />
+          disabled data-cy="card-type-input" />
         <BaseInput v-model="newAccount.cardName" type="text" label="Card Name"
-          placeholder="Auto-filled from card number" disabled />
+          placeholder="Auto-filled from card number" disabled data-cy="card-name-input" />
         <BaseInput v-model="newAccount.CVV" type="password" label="CVV" placeholder="123" maxlength="3"
-          :error="errors.CVV" @input="numbersOnly('CVV')" @blur="validateField('CVV', 'Enter CVV.')" required />
+          :error="errors.CVV" @input="numbersOnly('CVV')" @blur="validateField('CVV', 'Enter CVV.')" required
+          data-cy="card-cvv-input" />
       </div>
 
       <div class="flex justify-end">
         <BaseButton v-if="newAccount.type" type="submit" :loading="loading" loading-text="Adding..." :disabled="loading"
-          aria-busy="loading">
+          data-cy="add-account-button">
           Add Account
         </BaseButton>
       </div>
     </form>
   </div>
 </template>
+
 
 <script setup>
 import { ref, reactive, watch } from "vue"

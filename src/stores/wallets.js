@@ -3,13 +3,26 @@ import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/utils/api'
 
+
 export const useWalletsStore = defineStore('wallets', () => {
   const wallets = ref([])
   const localCurrency = ref('NGN')
 
-  // Loading and error states
   const loading = ref(true)
   const error = ref('')
+
+  // Determine if backend expects query param (local) or path param (prod)
+  const isLocal = import.meta.env.VITE_API_BASE_URL.includes('localhost')
+
+  const patchWallet = async (walletId, data) => {
+    if (isLocal) {
+      // Local backend expects /wallets/:id/
+      return api.patch(`/wallets/${walletId}/`, data)
+    } else {
+      // Deployed backend accepts query param
+      return api.patch(`/wallets?id=${walletId}`, data)
+    }
+  }
 
   // --- Fetch wallets
   const fetchWallets = async () => {
@@ -19,7 +32,6 @@ export const useWalletsStore = defineStore('wallets', () => {
       const res = await api.get('/wallets')
       wallets.value = res.data
 
-      // Provision defaults if user has no wallets
       if (wallets.value.length === 0) {
         const defaults = [
           { currency: 'USD', balance: 0, createdAt: new Date().toISOString() },
@@ -59,50 +71,41 @@ export const useWalletsStore = defineStore('wallets', () => {
 
   // --- Deposit
   const depositFunds = async ({ wallet, amount }) => {
-    const walletId = wallet
-    const walletObj = wallets.value.find(w => w.id === walletId)
-
-    if (!walletObj) throw new Error(`Wallet not found: ${walletId}`)
+    const walletObj = wallets.value.find(w => w.id === wallet)
+    if (!walletObj) throw new Error(`Wallet not found: ${wallet}`)
 
     walletObj.balance += Number(amount)
-
     try {
-      await api.patch(`/wallets?id=${walletId}`, walletObj)
+      await patchWallet(walletObj.id, walletObj)
     } catch (err) {
       error.value = err.message || 'Failed to update wallet'
       throw err
     }
-
     return walletObj
   }
 
-  // --- Send funds
+  // --- Send
   const sendFunds = async ({ wallet, amount, recipient }) => {
-    const walletId = wallet
-    const walletObj = wallets.value.find(w => w.id === walletId)
-
-    if (!walletObj) throw new Error(`Wallet not found: ${walletId}`)
+    const walletObj = wallets.value.find(w => w.id === wallet)
+    if (!walletObj) throw new Error(`Wallet not found: ${wallet}`)
     if (walletObj.balance < amount) throw new Error('Insufficient balance')
 
     walletObj.balance -= Number(amount)
-
     try {
-      await api.patch(`/wallets?id=${walletId}`, walletObj)
+      await patchWallet(walletObj.id, walletObj)
     } catch (err) {
       error.value = err.message || 'Failed to update wallet after send'
       throw err
     }
-
     return { ...walletObj, recipient }
   }
 
-  // --- Swap funds
+  // --- Swap
   const swapFunds = async ({ fromWallet, toWallet, amount, convertedAmount }) => {
     const fromWalletObj = wallets.value.find(w => w.id === fromWallet)
     const toWalletObj = wallets.value.find(w => w.id === toWallet)
 
-    if (!fromWalletObj) throw new Error(`Wallet not found: ${fromWallet}`)
-    if (!toWalletObj) throw new Error(`Wallet not found: ${toWallet}`)
+    if (!fromWalletObj || !toWalletObj) throw new Error('Wallet not found')
     if (fromWalletObj.balance < amount) throw new Error('Insufficient balance')
 
     fromWalletObj.balance -= Number(amount)
@@ -110,8 +113,8 @@ export const useWalletsStore = defineStore('wallets', () => {
 
     try {
       await Promise.all([
-        api.patch(`/wallets?id=${fromWallet}`, fromWalletObj),
-        api.patch(`/wallets?id=${toWallet}`, toWalletObj),
+        patchWallet(fromWalletObj.id, fromWalletObj),
+        patchWallet(toWalletObj.id, toWalletObj)
       ])
     } catch (err) {
       error.value = err.message || 'Failed to update wallets after swap'
@@ -121,13 +124,8 @@ export const useWalletsStore = defineStore('wallets', () => {
     return { from: fromWalletObj, to: toWalletObj }
   }
 
-  // --- Setters
-  const setWallets = (data) => {
-    wallets.value = data
-  }
-  const setLocalCurrency = (currency) => {
-    localCurrency.value = currency
-  }
+  const setWallets = (data) => (wallets.value = data)
+  const setLocalCurrency = (currency) => (localCurrency.value = currency)
 
   return {
     wallets,

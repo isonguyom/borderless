@@ -45,7 +45,6 @@ async function handleSubmit() {
     // redirect after successful auth
     router.push('/')
   } catch (e) {
-    // handle known error messages from mock API
     if (e.code === 'USER_EXISTS') {
       error.value = 'Account already exists. Please login.'
     } else if (e.code === 'USER_NOT_FOUND') {
@@ -58,32 +57,37 @@ async function handleSubmit() {
   }
 }
 
-// Clear error when switching modes
-watch(mode, () => {
-  error.value = ''
-})
-
-// Clear error when editing
-watch(input, () => {
-  if (error.value) error.value = ''
-})
+watch(mode, () => { error.value = '' })
+watch(input, () => { if (error.value) error.value = '' })
 </script>
 
 <template>
   <AuthLayout :welcome-msg="mode === 'signup' ? 'Welcome' : 'Welcome back'">
     <div class="w-full">
       <!-- Heading -->
-      <h1 class="text-xl font-medium text-gray-300 mb-4 uppercase" id="auth-heading">
+      <h1 class="text-xl font-medium text-gray-300 mb-4 uppercase" id="auth-heading" data-cy="auth-heading">
         {{ mode === 'signup' ? 'Sign Up' : 'Login' }}
       </h1>
 
       <!-- Auth Form -->
-      <form @submit.prevent="handleSubmit" aria-labelledby="auth-heading" class="flex flex-col gap-y-3">
+      <form @submit.prevent="handleSubmit" aria-labelledby="auth-heading" class="flex flex-col gap-y-3" data-cy="auth-form">
+        <BaseInput
+          v-model="input"
+          label=""
+          placeholder="Enter Email or Phone"
+          variant="light"
+          :error="error"
+          :loading="loading"
+          data-cy="email-or-phone-input"
+        />
 
-        <BaseInput v-model="input" label="" placeholder="Enter Email or Phone" variant="light" :error="error"
-          :loading="loading" />
-
-        <BaseButton type="submit" variant="secondary" :loading="loading" loading-text="Processing">
+        <BaseButton
+          type="submit"
+          variant="secondary"
+          :loading="loading"
+          loading-text="Processing"
+          data-cy="onboard-button"
+        >
           {{ mode === 'signup' ? 'Create Account' : 'Continue' }}
         </BaseButton>
       </form>
@@ -92,16 +96,26 @@ watch(input, () => {
       <p class="mt-4 text-sm text-gray-300 text-center">
         <span v-if="mode === 'login'">
           Don’t have an account?
-          <button type="button" @click="mode = 'signup'"
-            class="text-gray-200 hover:text-white underline font-semibold cursor-pointer" :disabled="loading">
+          <button
+            type="button"
+            @click="mode = 'signup'"
+            class="text-gray-200 hover:text-white underline font-semibold cursor-pointer"
+            :disabled="loading"
+            data-cy="switch-to-signup"
+          >
             Sign up
           </button>
         </span>
 
         <span v-else>
           Already registered?
-          <button type="button" @click="mode = 'login'"
-            class="text-gray-200 hover:text-white underline font-semibold cursor-pointer" :disabled="loading">
+          <button
+            type="button"
+            @click="mode = 'login'"
+            class="text-gray-200 hover:text-white underline font-semibold cursor-pointer"
+            :disabled="loading"
+            data-cy="switch-to-login"
+          >
             Login
           </button>
         </span>

@@ -110,49 +110,54 @@ watch(user, (newUser) => {
 }, { immediate: true }) // runs immediately if user already exists
 
 </script>
-
 <template>
   <AppLayout>
-    <div class="w-full mx-auto pb-8 space-y-8">
+    <div class="w-full mx-auto pb-8 space-y-8" data-cy="settings-page">
       <!-- Page Title -->
-      <h2 class="text-lg md:text-xl font-semibold">Settings</h2>
+      <h2 class="text-lg md:text-xl font-semibold" data-cy="settings-page-title">Settings</h2>
 
       <!-- Profile Settings -->
-      <form @submit.prevent="handleSaveProfileSettings" class="space-y-3" novalidate>
-        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6 space-y-4">
-          <h2 class="text-sm md:text-base font-medium">Profile</h2>
+      <form @submit.prevent="handleSaveProfileSettings" class="space-y-3" novalidate data-cy="profile-settings-form">
+        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6 space-y-4" data-cy="profile-section">
+          <h2 class="text-sm md:text-base font-medium" data-cy="profile-section-title">Profile</h2>
 
           <div class="space-y-3">
             <BaseInput v-model="profileForm.emailOrPhone" type="text" label="Email or Phone"
-              placeholder="Enter email or phone" />
-            <BaseInput v-model="profileForm.username" type="text" label="Username" placeholder="Enter username" />
+              placeholder="Enter email or phone" data-cy="profile-email-input" />
+            <BaseInput v-model="profileForm.username" type="text" label="Username" placeholder="Enter username"
+              data-cy="profile-username-input" />
             <BaseSelect v-model="profileForm.currency" :options="currencies ?? []" :disabled="currenciesLoading"
-              label="Preferred Currency" />
+              label="Preferred Currency" data-cy="profile-currency-select" />
           </div>
         </section>
 
         <!-- Notification Preferences -->
-        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6 space-y-4">
-          <h2 class="text-sm md:text-base font-medium">Notifications</h2>
+        <section class="bg-white dark:bg-gray-800 rounded-2xl shadow p-4 sm:p-6 space-y-4"
+          data-cy="notifications-section">
+          <h2 class="text-sm md:text-base font-medium" data-cy="notifications-section-title">Notifications</h2>
           <div class="space-y-3">
-            <BaseSwitch v-model="profileForm.notifications.email" label="Email Notifications" />
-            <BaseSwitch v-model="profileForm.notifications.push" label="Push Notifications" />
-            <BaseSwitch v-model="profileForm.notifications.inApp" label="In-App Notifications" />
+            <BaseSwitch v-model="profileForm.notifications.email" label="Email Notifications"
+              data-cy="notification-email-switch" />
+            <BaseSwitch v-model="profileForm.notifications.push" label="Push Notifications"
+              data-cy="notification-push-switch" />
+            <BaseSwitch v-model="profileForm.notifications.inApp" label="In-App Notifications"
+              data-cy="notification-inapp-switch" />
           </div>
         </section>
 
         <!-- Save -->
         <div class="flex justify-end">
-          <BaseButton type="submit">Save Settings</BaseButton>
+          <BaseButton type="submit" data-cy="save-settings-button">Save Settings</BaseButton>
         </div>
       </form>
 
       <!-- Deposit Accounts -->
       <DepositAccounts :accounts="accounts" :loading="depositAccountsLoading" @add-account="handleAddAccount"
-        @remove-account="handleRemoveAccount" />
+        @remove-account="handleRemoveAccount" data-cy="deposit-accounts-component" />
 
       <!-- Toast -->
-      <BaseToast v-if="toast.message" :message="toast.message" :type="toast.type" :duration="toast.duration" />
+      <BaseToast v-if="toast.message" :message="toast.message" :type="toast.type" :duration="toast.duration"
+        data-cy="settings-toast" />
     </div>
   </AppLayout>
 </template>

@@ -75,192 +75,115 @@
   ],
   "users": [
     {
-      "0": "9",
-      "1": "9",
-      "2": "1",
-      "3": "6",
-      "id": "9916",
+      "id": "1f94",
       "emailOrPhone": "isonguyom@gmail.com",
       "currency": "NGN",
-      "username": "SwiftPanther159",
+      "username": "GoldenShark123",
       "notifications": {
         "email": true,
         "push": false,
         "inApp": true
       },
-      "createdAt": "2025-09-21T14:11:26.684Z"
-    },
-    {
-      "id": "8988",
-      "emailOrPhone": "08022475918",
-      "currency": "NGN",
-      "username": "MightyFalcon108",
-      "notifications": {
-        "email": true,
-        "push": false,
-        "inApp": true
-      },
-      "createdAt": "2025-09-21T23:54:33.263Z"
+      "createdAt": "2025-09-22T12:45:13.186Z"
     }
   ],
   "tokens": [
     {
-      "id": "b08a",
-      "userId": "9916",
-      "token": "mock_1758463886710_itvywhk04rp"
-    },
-    {
-      "id": "7280",
-      "userId": "9916",
-      "token": "mock_1758465276471_ukhosleye9"
-    },
-    {
-      "id": "ee65",
-      "userId": "9916",
-      "token": "mock_1758485935130_r1cccguxuxn"
-    },
-    {
-      "id": "07a6",
-      "userId": "9916",
-      "token": "mock_1758488711639_eu3h4qf8a2f"
-    },
-    {
-      "id": "4781",
-      "userId": "9916",
-      "token": "mock_1758488722031_eentgwy1y1s"
-    },
-    {
-      "id": "1f24",
-      "userId": "9916",
-      "token": "mock_1758489081631_k02vgc4qli"
-    },
-    {
-      "id": "39a2",
-      "userId": "9916",
-      "token": "mock_1758498569923_w195py1ztfd"
-    },
-    {
-      "id": "948e",
-      "userId": "8988",
-      "token": "mock_1758498873785_aw3rufgi579"
-    },
-    {
-      "id": "4b0e",
-      "userId": "9916",
-      "token": "mock_1758503798661_w803g4garod"
+      "id": "63dc",
+      "userId": "1f94",
+      "token": "mock_1758545113441_glhphz917p9"
     }
   ],
   "wallets": [
     {
-      "id": "6703",
+      "id": "2cad",
       "currency": "USD",
-      "balance": 17,
-      "createdAt": "2025-09-21T19:07:32.808Z"
+      "balance": 30,
+      "createdAt": "2025-09-22T12:45:14.996Z"
     },
     {
-      "id": "f2ab",
+      "id": "bf81",
       "currency": "NGN",
-      "balance": 7500,
-      "createdAt": "2025-09-21T19:07:32.808Z"
+      "balance": 10000,
+      "createdAt": "2025-09-22T12:45:14.996Z"
     },
     {
-      "id": "1a9b",
+      "id": "ffe2",
       "currency": "EUR",
-      "balance": 0,
-      "createdAt": "2025-09-21T19:07:40.034Z"
-    },
-    {
-      "id": "9d5a",
-      "currency": "GBP",
-      "balance": 0,
-      "createdAt": "2025-09-21T19:31:17.393Z"
-    },
-    {
-      "id": "56b1",
-      "currency": "USDT",
-      "balance": 0,
-      "createdAt": "2025-09-21T19:38:11.017Z"
-    },
-    {
-      "id": "c1a6",
-      "currency": "USDC",
-      "balance": 0,
-      "createdAt": "2025-09-22T01:17:10.680Z"
+      "balance": 13.68,
+      "createdAt": "2025-09-22T12:45:30.293Z"
     }
   ],
   "transactions": [
     {
-      "id": "76fe",
+      "id": "a4a8",
       "type": "Deposit",
       "currency": "USD",
-      "amount": "30",
-      "date": "2025-09-21T14:38:35.001Z",
+      "amount": "50",
+      "date": "2025-09-22T12:49:01.343Z",
       "status": "Completed",
-      "account": "1758465501354"
+      "account": "1758545232732"
     },
     {
-      "id": "e8cd",
+      "id": "a51c",
+      "type": "Deposit",
+      "currency": "NGN",
+      "amount": "1000",
+      "date": "2025-09-22T12:49:20.010Z",
+      "status": "Completed",
+      "account": "1758545264331"
+    },
+    {
+      "id": "0fb4",
+      "type": "Deposit",
+      "currency": "EUR",
+      "amount": "10",
+      "date": "2025-09-22T12:49:30.067Z",
+      "status": "Completed",
+      "account": "1758545232732"
+    },
+    {
+      "id": "b4bc",
       "type": "Send",
       "currency": "USD",
       "amount": "10",
-      "date": "2025-09-21T14:38:55.096Z",
+      "date": "2025-09-22T12:49:43.515Z",
       "status": "Completed",
-      "recipient": "azfxgcvhbjn,l"
+      "recipient": "vhbjkg776"
     },
     {
-      "id": "b1c8",
+      "id": "f27c",
       "type": "Swap",
       "currency": "USD → NGN",
       "amount": "10",
       "convertedAmount": 15000,
-      "date": "2025-09-21T14:39:06.890Z",
+      "date": "2025-09-22T12:49:59.412Z",
       "status": "Completed"
     },
     {
-      "id": "e185",
-      "type": "Deposit",
-      "currency": "USD",
-      "amount": "20",
-      "date": "2025-09-21T15:25:03.861Z",
-      "status": "Completed",
-      "account": "1758465501354"
-    },
-    {
-      "id": "1630",
-      "type": "Deposit",
-      "currency": "USD",
-      "amount": "22",
-      "date": "2025-09-21T19:14:51.140Z",
-      "status": "Completed",
-      "account": "1758465501354"
-    },
-    {
-      "id": "f9fe",
-      "type": "Deposit",
-      "currency": "USD",
-      "amount": "10",
-      "date": "2025-09-21T19:37:46.817Z",
-      "status": "Completed",
-      "account": "1758465501354"
-    },
-    {
-      "id": "3134",
-      "type": "Send",
-      "currency": "USD",
-      "amount": "10",
-      "date": "2025-09-21T19:40:18.225Z",
-      "status": "Completed",
-      "recipient": "sdxfcgvhbjkl"
-    },
-    {
-      "id": "6f16",
+      "id": "165f",
       "type": "Swap",
-      "currency": "USD → NGN",
-      "amount": "5",
-      "convertedAmount": 7500,
-      "date": "2025-09-21T19:40:45.592Z",
+      "currency": "NGN → EUR",
+      "amount": "6000",
+      "convertedAmount": 3.68,
+      "date": "2025-09-22T12:50:19.743Z",
       "status": "Completed"
     }
   ],
-  "depositAccounts": []
+  "depositAccounts": [
+    {
+      "id": "1758545232732",
+      "type": "Bank Account",
+      "accountName": "Account 8987",
+      "bankName": "Access Bank",
+      "accountNumber": "2345678987"
+    },
+    {
+      "id": "1758545264331",
+      "type": "Crypto Wallet",
+      "accountName": "",
+      "walletName": "ETH",
+      "address": "awse4346758diiuhgfdsaS"
+    }
+  ]
 }
