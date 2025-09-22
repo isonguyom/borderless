@@ -89,6 +89,18 @@
         "inApp": true
       },
       "createdAt": "2025-09-21T14:11:26.684Z"
+    },
+    {
+      "id": "8988",
+      "emailOrPhone": "08022475918",
+      "currency": "NGN",
+      "username": "MightyFalcon108",
+      "notifications": {
+        "email": true,
+        "push": false,
+        "inApp": true
+      },
+      "createdAt": "2025-09-21T23:54:33.263Z"
     }
   ],
   "tokens": [
@@ -121,6 +133,21 @@
       "id": "1f24",
       "userId": "9916",
       "token": "mock_1758489081631_k02vgc4qli"
+    },
+    {
+      "id": "39a2",
+      "userId": "9916",
+      "token": "mock_1758498569923_w195py1ztfd"
+    },
+    {
+      "id": "948e",
+      "userId": "8988",
+      "token": "mock_1758498873785_aw3rufgi579"
+    },
+    {
+      "id": "4b0e",
+      "userId": "9916",
+      "token": "mock_1758503798661_w803g4garod"
     }
   ],
   "wallets": [
@@ -153,6 +180,12 @@
       "currency": "USDT",
       "balance": 0,
       "createdAt": "2025-09-21T19:38:11.017Z"
+    },
+    {
+      "id": "c1a6",
+      "currency": "USDC",
+      "balance": 0,
+      "createdAt": "2025-09-22T01:17:10.680Z"
     }
   ],
   "transactions": [

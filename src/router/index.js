@@ -3,11 +3,6 @@ import { useAuthStore } from '@/stores/auth'
 
 const routes = [
   {
-    path: '/test',
-    name: 'Test',
-    component: () => import('@/views/TestView.vue')
-  },
-  {
     path: '/onboard',
     name: 'Onboard',
     component: () => import('@/views/OnboardView.vue')
@@ -28,12 +23,6 @@ const routes = [
     path: '/history',
     name: 'History',
     component: () => import('@/views/HistoryView.vue'),
-    meta: { requiresAuth: true }
-  },
-  {
-    path: '/wallet',
-    name: 'Wallet',
-    component: () => import('@/views/WalletView.vue'),
     meta: { requiresAuth: true }
   },
   { path: '/settings', name: 'Settings', component: () => import('@/views/SettingsView.vue'), meta: { requiresAuth: true } },

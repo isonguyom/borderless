@@ -288,9 +288,9 @@ Object.keys(forms.value).forEach((formKey) => {
       (newVal) => {
         if (newVal) {
           if (!errors.value[formKey]) {
-            errors.value[formKey] = {}     // ✅ ensure object exists
+            errors.value[formKey] = {}     // ensure object exists
           }
-          errors.value[formKey][fieldKey] = ''  // ✅ safe assignment
+          errors.value[formKey][fieldKey] = ''  // safe assignment
         }
       }
     )

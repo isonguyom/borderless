@@ -1,4 +1,3 @@
-// /src/stores/fxStore.js
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import { storeToRefs } from 'pinia'
