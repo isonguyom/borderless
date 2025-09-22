@@ -2,6 +2,7 @@
 import { defineStore } from 'pinia'
 import { ref } from 'vue'
 import api from '@/utils/api'
+import { useAuthStore } from './auth'
 
 export const useDepositAccountsStore = defineStore('depositAccounts', () => {
   const accounts = ref([])
@@ -11,6 +12,9 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
   // Detect environment
   const isLocal = import.meta.env.VITE_API_BASE_URL?.includes('localhost')
 
+  const authStore = useAuthStore()
+  const userId = () => authStore.user?.id
+
   // --- PATCH/PUT helper
   const patchAccount = async (id, data) => {
     if (isLocal) {
@@ -18,7 +22,7 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
       return api.put(`/depositAccounts/${id}`, data)
     } else {
       // Production API prefers partial updates
-      return api.patch(`/depositAccounts?id=${id}`, data)
+      return api.patch(`/depositAccounts?id=${id}&userId=${userId()}`, data)
     }
   }
 
@@ -27,7 +31,7 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
     if (isLocal) {
       return api.delete(`/depositAccounts/${id}`)
     } else {
-      return api.delete(`/depositAccounts?id=${id}`)
+      return api.delete(`/depositAccounts?id=${id}&userId=${userId()}`)
     }
   }
 
@@ -36,7 +40,12 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
     loading.value = true
     error.value = ''
     try {
-      const res = await api.get('/depositAccounts')
+      let res
+      if (isLocal) {
+        res = await api.get(`/depositAccounts?userId=${userId()}`)
+      } else {
+        res = await api.get(`/depositAccounts?userId=${userId()}`)
+      }
       accounts.value = res.data
     } catch (err) {
       error.value = err.message || 'Failed to fetch deposit accounts'
@@ -48,7 +57,8 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
   // --- Add new account
   const addAccount = async (account) => {
     try {
-      const res = await api.post('/depositAccounts', account)
+      const payload = { ...account, userId: userId() }
+      const res = await api.post('/depositAccounts', payload)
       accounts.value.push(res.data)
       return res.data
     } catch (err) {
@@ -68,8 +78,10 @@ export const useDepositAccountsStore = defineStore('depositAccounts', () => {
 
       const res = await patchAccount(id, payload)
       const idx = accounts.value.findIndex(acc => acc.id === id)
-      if (idx !== -1) accounts.value[idx] = res.data
-      return res.data
+      if (idx !== -1) {
+        accounts.value[idx] = Array.isArray(res.data) ? res.data[0] : res.data
+      }
+      return Array.isArray(res.data) ? res.data[0] : res.data
     } catch (err) {
       error.value = err.message || 'Failed to update account'
       throw err
