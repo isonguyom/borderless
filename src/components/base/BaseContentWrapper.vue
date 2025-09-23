@@ -7,13 +7,6 @@ defineProps({
   loading: { type: Boolean, default: false },
   error: { type: [Boolean, String], default: false },
   items: { type: [Array, Object], default: () => [] },
-  errorState: {
-    type: Object,
-    default: () => ({
-      title: "Something went wrong",
-      description: "Please try again later."
-    })
-  },
   emptyState: {
     type: Object,
     default: () => ({
@@ -31,7 +24,7 @@ defineProps({
     <BaseLoadingState v-if="loading" />
 
     <!-- Error -->
-    <BaseErrorState v-else-if="error && error.length > 0" :details="errorState" :retry="retry" />
+    <BaseErrorState v-else-if="error && error.length > 0" :msg="error" :retry="retry" />
 
 
     <!-- Empty -->

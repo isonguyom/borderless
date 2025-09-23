@@ -23,7 +23,7 @@
               <span v-else-if="acc.type === 'Card'" class="flex flex-col">
                 {{ acc.cardType }} - ****{{ acc.last4 }}
                 <span v-if="acc.cardName" class="text-xs font-medium text-gray-600 dark:text-gray-400">{{ acc.cardName
-                }}</span>
+                  }}</span>
               </span>
             </p>
           </div>
